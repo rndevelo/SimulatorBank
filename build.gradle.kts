@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.ktlint.gradle) apply false // NUEVO: Hacer el plugin Ktlint disponible
 }
 
 // Configure Detekt for all subprojects that apply the Detekt plugin
@@ -31,5 +32,21 @@ subprojects {
             // baseline = rootProject.file("config/detekt/detekt-baseline.xml")
             // The reports block has been moved to tasks.withType<Detekt>()
         }
+    }
+
+    // NUEVO: Placeholder para configuraciones comunes de Ktlint
+    // Esto se aplicará a cualquier submódulo que aplique el plugin Ktlint.
+    plugins.withId("org.jlleitschuh.gradle.ktlint") {
+        // Ejemplo de configuración que podrías añadir aquí en el futuro:
+        // extensions.configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        //     version.set("1.2.1") // Fija la versión de la herramienta Ktlint a usar
+        //     // verbose.set(true)
+        //     // android.set(true) // Habilita reglas específicas para Android si no se detectan automáticamente
+        //     // reporters {
+        //     //    reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
+        //     //    reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
+        //     //    reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.SARIF)
+        //     // }
+        // }
     }
 }

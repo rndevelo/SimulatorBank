@@ -9,37 +9,44 @@ on:
 
 # 2. ¿Qué trabajos (jobs) se van a realizar?
 jobs:
-  # Definimos un único job llamado 'detekt_analysis'
-  detekt_analysis:
-    name: Run Detekt Analysis # Nombre legible para este job
-    runs-on: ubuntu-latest  # 3. ¿En qué tipo de máquina se ejecuta? (Un servidor Linux de GitHub)
+  # Nombre del job actualizado para reflejar múltiples comprobaciones
+  code_quality_checks:
+    name: Run Code Quality Checks # Nombre legible actualizado
+    runs-on: ubuntu-latest
 
-    # 4. ¿Qué pasos (steps) se siguen dentro de este job?
     steps:
-      # Paso 4.1: Descargar el código de tu repositorio
       - name: Checkout Code
-        uses: actions/checkout@v4 # 'uses' indica que usamos una acción predefinida por GitHub o la comunidad
+        uses: actions/checkout@v4
 
-      # Paso 4.2: Configurar Java. AGP requiere Java 17.
       - name: Set up JDK 17
         uses: actions/setup-java@v4
-        with: # 'with' se usa para pasar parámetros a la acción
-          java-version: '17' # Cambiado de '11' a '17'
-          distribution: 'temurin' # Una distribución popular de OpenJDK
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-      # Paso 4.3: Dar permisos de ejecución al script de Gradle (necesario en Linux)
       - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew # 'run' ejecuta un comando de terminal
+        run: chmod +x ./gradlew
 
-      # Paso 4.4: Ejecutar la tarea de Detekt
+      # Paso para Detekt
       - name: Run Detekt
-        run: ./gradlew detekt # Si Detekt encuentra errores, este paso fallará y el CI se marcará como fallido
+        run: ./gradlew detekt
 
-      # Paso 4.5: Guardar el informe HTML de Detekt
-      # Esto es útil para ver los detalles si Detekt falla.
-      - name: Upload Detekt HTML Report
-        if: always() # 'always()' asegura que este paso se ejecute incluso si "Run Detekt" falla
+      # NUEVO: Paso para Ktlint
+      - name: Run Ktlint
+        run: ./gradlew ktlintCheck # Ejecuta ktlintCheck en todos los módulos donde esté aplicado
+
+      # Subir informes de Detekt
+      - name: Upload Detekt HTML Reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: detekt-html-report # Nombre del artefacto que se guardará
-          path: "**/build/reports/detekt/*.html" # Ruta a los archivos a guardar (todos los .html de Detekt)
+          name: detekt-html-reports # Nombre del artefacto actualizado
+          path: "**/build/reports/detekt/*.html"
+
+      # OPCIONAL (lo podemos añadir después si quieres):
+      # - name: Upload Ktlint SARIF Report
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ktlint-sarif-reports
+      #     path: "**/build/reports/ktlint/**/ktlint*.sarif" # Ktlint puede generar informes SARIF

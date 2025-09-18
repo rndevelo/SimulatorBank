@@ -11,7 +11,8 @@ composeBom = "2025.09.00"
 jetbrainsKotlinJvm = "2.2.20"
 appcompat = "1.7.1"
 material = "1.13.0"
-detekt = "1.23.8" # Nueva versión añadida
+detekt = "1.23.8"
+ktlintGradle = "13.1.0" # NUEVA VERSIÓN AÑADIDA
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,5 +38,6 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" } # Nuevo plugin añadido
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+ktlint-gradle = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle" } # NUEVO PLUGIN AÑADIDO
 

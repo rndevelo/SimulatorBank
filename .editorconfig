@@ -1,0 +1,29 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Default settings for all files
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# Settings for Kotlin files (.kt and .kts)
+[*.{kt,kts}]
+# Enable Ktlint experimental rules (needed for Jetpack Compose official ruleset)
+ktlint_experimental = true
+
+# Disable the standard function naming rule as it conflicts with Composable conventions
+ktlint_standard_function-naming = disabled
+
+# Enable the Jetpack Compose specific function naming rule
+# This rule understands that @Composable functions should start with an uppercase letter.
+ktlint_compose_composable-function-naming = enabled
+
+# You can enable other Compose rules as needed, for example:
+# ktlint_compose_annotation-spacing = enabled
+# ktlint_compose_parameter-order = enabled
