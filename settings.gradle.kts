@@ -12,8 +12,10 @@ pluginManagement {
         maven {
             url = uri("https://maven.pkg.github.com/rndevelo/build-logic")
             credentials {
-                username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GPR_USER")
-                password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GPR_KEY")
+                username = providers.gradleProperty("gpr.user").orNull
+                    ?: System.getenv("GPR_USER")
+                password = providers.gradleProperty("gpr.key").orNull
+                    ?: System.getenv("GPR_KEY")
             }
         }
     }
@@ -23,6 +25,15 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/rndevelo/build-logic")
+            credentials {
+                username = providers.gradleProperty("gpr.user").orNull
+                    ?: System.getenv("GPR_USER")
+                password = providers.gradleProperty("gpr.key").orNull
+                    ?: System.getenv("GPR_KEY")
+            }
+        }
     }
 }
 
