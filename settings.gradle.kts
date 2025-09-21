@@ -1,5 +1,7 @@
 pluginManagement {
     repositories {
+        mavenCentral() // MOVIDO AL PRINCIPIO
+        gradlePluginPortal()
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
@@ -7,8 +9,13 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
-        mavenCentral()
-        gradlePluginPortal()
+        maven {
+            url = uri("https://maven.pkg.github.com/rndevelo/build-logic")
+            credentials {
+                username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GPR_USER")
+                password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GPR_KEY")
+            }
+        }
     }
 }
 dependencyResolutionManagement {
@@ -24,3 +31,6 @@ include(":app")
 include(":features:auth:auth-domain")
 include(":features:auth:auth-data")
 include(":features:auth:auth-presentation")
+include(":features:account:account-domain")
+include(":features:account:account-data")
+include(":features:account:account-presentation")
