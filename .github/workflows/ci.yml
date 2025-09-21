@@ -11,25 +11,28 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Checkout Code
-              uses: actions/checkout@v4
+            -   name: Checkout Code
+                uses: actions/checkout@v4
 
-            - name: Set up JDK 17
-              uses: actions/setup-java@v4
-              with:
-                  java-version: '17'
-                  distribution: 'temurin'
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v4
+                with:
+                    java-version: '17'
+                    distribution: 'temurin'
+                    server-id: github  # nombre que usará en settings.xml
+                    server-username: GPR_USER
+                    server-password: GPR_KEY
 
-            - name: Setup environment for GitHub Packages
-              run: |
-                  echo "GPR_USER=${{ secrets.GPR_USER }}" >> $GITHUB_ENV
-                  echo "GPR_KEY=${{ secrets.GPR_KEY }}" >> $GITHUB_ENV
+            -   name: Setup environment for GitHub Packages
+                run: |
+                    echo "GPR_USER=${{ secrets.GPR_USER }}" >> $GITHUB_ENV
+                    echo "GPR_KEY=${{ secrets.GPR_KEY }}" >> $GITHUB_ENV
 
-            - name: Grant execute permission for gradlew
-              run: chmod +x ./gradlew
+            -   name: Grant execute permission for gradlew
+                run: chmod +x ./gradlew
 
             -   name: Run Detekt
                 run: ./gradlew detekt --stacktrace --info
 
-            - name: Run Ktlint
-              run: ./gradlew ktlintCheck --stacktrace
+            -   name: Run Ktlint
+                run: ./gradlew ktlintCheck --stacktrace
