@@ -2,51 +2,61 @@ name: Basic Android CI
 
 # 1. ¿Cuándo se ejecuta este CI?
 on:
-  push: # En cada push a estas ramas
-    branches: [ main, master ]
-  pull_request: # En cada pull request dirigido a estas ramas
-    branches: [ main, master ]
+    push: # En cada push a estas ramas
+        branches: [ main, master ]
+    pull_request: # En cada pull request dirigido a estas ramas
+        branches: [ main, master ]
 
 # 2. ¿Qué trabajos (jobs) se van a realizar?
 jobs:
-  # Nombre del job actualizado para reflejar múltiples comprobaciones
-  code_quality_checks:
-    name: Run Code Quality Checks # Nombre legible actualizado
-    runs-on: ubuntu-latest
+    # Nombre del job actualizado para reflejar múltiples comprobaciones
+    code_quality_checks:
+        name: Run Code Quality Checks # Nombre legible actualizado
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+        steps:
+            -   name: Checkout Code
+                uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v4
+                with:
+                    java-version: '17'
+                    distribution: 'temurin'
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+            -   name: Setup Gradle
+                uses: gradle/gradle-build-action@v3
+                with:
+                    gradle-version: 8.14.3
 
-      # Paso para Detekt
-      - name: Run Detekt
-        run: ./gradlew detekt
+            -   name: Configure env for GitHub Packages
+                run: |
+                    echo "GPR_USER=${{ secrets.GPR_USER }}" >> $GITHUB_ENV
+                    echo "GPR_KEY=${{ secrets.GPR_KEY }}" >> $GITHUB_ENV
 
-      # NUEVO: Paso para Ktlint
-      - name: Run Ktlint
-        run: ./gradlew ktlintCheck # Ejecuta ktlintCheck en todos los módulos donde esté aplicado
+            -   name: Grant execute permission for gradlew
+                run: chmod +x ./gradlew
 
-      # Subir informes de Detekt
-      - name: Upload Detekt HTML Reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: detekt-html-reports # Nombre del artefacto actualizado
-          path: "**/build/reports/detekt/*.html"
+            # Paso para Detekt
+            -   name: Run Detekt
+                run: ./gradlew detekt
 
-      # OPCIONAL (lo podemos añadir después si quieres):
-      # - name: Upload Ktlint SARIF Report
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: ktlint-sarif-reports
-      #     path: "**/build/reports/ktlint/**/ktlint*.sarif" # Ktlint puede generar informes SARIF
+            # NUEVO: Paso para Ktlint
+            -   name: Run Ktlint
+                run: ./gradlew ktlintCheck # Ejecuta ktlintCheck en todos los módulos donde esté aplicado
+
+            # Subir informes de Detekt
+            -   name: Upload Detekt HTML Reports
+                if: always()
+                uses: actions/upload-artifact@v4
+                with:
+                    name: detekt-html-reports # Nombre del artefacto actualizado
+                    path: "**/build/reports/detekt/*.html"
+
+            # OPCIONAL (lo podemos añadir después si quieres):
+            # - name: Upload Ktlint SARIF Report
+            #   if: always()
+            #   uses: actions/upload-artifact@v4
+            #   with:
+            #     name: ktlint-sarif-reports
+            #     path: "**/build/reports/ktlint/**/ktlint*.sarif" # Ktlint puede generar informes SARIF
