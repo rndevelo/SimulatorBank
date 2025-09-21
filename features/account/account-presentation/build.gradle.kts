@@ -1,5 +1,5 @@
 plugins {
-    id("io.github.rndevelo.buildlogic.android.feature") version "1.0.2"
+    id("io.github.rndevelo.buildlogic.android.feature") version "1.0.3"
 }
 
 android {

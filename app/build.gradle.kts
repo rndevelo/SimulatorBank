@@ -1,7 +1,7 @@
 plugins {
-    id("io.github.rndevelo.buildlogic.android.application") version "1.0.2"
-    id("io.github.rndevelo.buildlogic.android.application.compose") version "1.0.2"
-    id("io.github.rndevelo.buildlogic.di.library.compose") version "1.0.2"
+    id("io.github.rndevelo.buildlogic.android.application") version "1.0.3"
+    id("io.github.rndevelo.buildlogic.android.application.compose") version "1.0.3"
+    id("io.github.rndevelo.buildlogic.di.library.compose") version "1.0.3"
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint.gradle)
 }

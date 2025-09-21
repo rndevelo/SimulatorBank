@@ -1,4 +1,4 @@
 plugins {
-    id("io.github.rndevelo.buildlogic.jvm.library") version "1.0.2"
+    id("io.github.rndevelo.buildlogic.jvm.library") version "1.0.3"
 }
 
