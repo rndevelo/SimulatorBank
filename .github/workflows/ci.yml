@@ -2,9 +2,9 @@ name: Basic Android CI
 
 on:
     push:
-        branches: [ main, master ]
+        branches: [ main, develop ]
     pull_request:
-        branches: [ main, master ]
+        branches: [ main, develop ]
 
 jobs:
     code_quality_checks:
