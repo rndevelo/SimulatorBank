@@ -1,9 +1,8 @@
 plugins {
-    id("io.github.rndevelo.buildlogic.android.feature") version "1.0.3"
+    alias(libs.plugins.rndev.android.feature)
+    alias(libs.plugins.rndev.di.library.compose)
 }
 
 android {
     namespace = "io.rndev.account_presentation"
 }
-
-
