@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
@@ -36,7 +38,7 @@ enum class Loading {
 @Composable
 fun AuthScreen(
     authViewModel: AuthViewModel = hiltViewModel(),
-    onLoginSuccessNavigation: () -> Unit = {} // Callback para navegar tras login exitoso
+    onNavAccount: () -> Unit = {} // Callback para navegar tras login exitoso
 ) {
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -53,6 +55,7 @@ fun AuthScreen(
                         message = event.user.toString(),
                         duration = SnackbarDuration.Long
                     )
+                    onNavAccount()
                 }
 
                 is AuthUiEvent.Error -> {
@@ -66,14 +69,18 @@ fun AuthScreen(
         }
     }
 
-    AuthContent(snackBarHostState, isLoading, authViewModel)
+    AuthContent(
+        snackBarHostState,
+        isLoading,
+        authViewModel::onLoginClicked
+    )
 }
 
 @Composable
 private fun AuthContent(
     snackBarHostState: SnackbarHostState,
     isLoading: Loading,
-    authViewModel: AuthViewModel
+    onLoginClicked: (String, String) -> Unit,
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -125,7 +132,7 @@ private fun AuthContent(
                             onClick = {
                                 // Podrías añadir validación básica aquí si quieres antes de llamar al VM
                                 if (email.isNotBlank() && password.isNotBlank()) {
-                                    authViewModel.onLoginClicked(email, password)
+                                    onLoginClicked(email, password)
                                 } else {
                                     // Considera mostrar un Snackbar o mensaje para campos vacíos
                                     // scope.launch { snackbarHostState.showSnackbar("Email y contraseña no pueden estar vacíos.") }
@@ -140,5 +147,18 @@ private fun AuthContent(
                 }
             }
         }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun AuthContentPreview() {
+    Surface {
+        AuthContent(
+            snackBarHostState = remember { SnackbarHostState() },
+            isLoading = Loading.Hide,
+            onLoginClicked = { _, _ -> }
+        )
     }
 }
