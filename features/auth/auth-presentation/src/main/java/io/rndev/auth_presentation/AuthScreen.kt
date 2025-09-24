@@ -35,7 +35,6 @@ enum class Loading {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthScreen(
-    modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = hiltViewModel(),
     onLoginSuccessNavigation: () -> Unit = {} // Callback para navegar tras login exitoso
 ) {
@@ -67,23 +66,23 @@ fun AuthScreen(
         }
     }
 
-    AuthContent(snackBarHostState, modifier, isLoading, authViewModel)
+    AuthContent(snackBarHostState, isLoading, authViewModel)
 }
 
 @Composable
 private fun AuthContent(
     snackBarHostState: SnackbarHostState,
-    modifier: Modifier,
     isLoading: Loading,
     authViewModel: AuthViewModel
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackBarHostState) }
     ) { paddingValues ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp),

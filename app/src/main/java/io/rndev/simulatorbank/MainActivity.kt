@@ -21,11 +21,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SimulatorBankTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AuthScreen(
-                        modifier = Modifier.padding(innerPadding),
-                    )
-                }
+                AuthScreen()
             }
         }
     }
