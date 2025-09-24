@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ksp) apply false // Asegurado que está activo (probable dependencia para DI)
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.kotlin.kapt) apply false
+    alias(libs.plugins.kotlinxSerialization) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.ktlint.gradle) apply false
 }
