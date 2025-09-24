@@ -1,27 +1,31 @@
-package io.rndev.auth_data.network
+package io.rndev.auth_data
 
+import kotlinx.serialization.Serializable
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface AuthApi {
+interface AuthApiService {
     @POST("auth/login")
-    suspend fun login(@Body request: LoginRequest): LoginResponse
+    suspend fun login(@Body request: LoginRequest): Response<AuthDto>
 }
 
-@kotlinx.serialization.Serializable
+//REQUEST
+@Serializable
 data class LoginRequest(
     val username: String,
     val password: String
 )
 
-@kotlinx.serialization.Serializable
-data class LoginResponse(
+//RESPONSE
+@Serializable
+data class AuthDto(
     val access_token: String,
     val refresh_token: String,
     val user: UserDto
 )
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class UserDto(
     val id: String,
     val username: String,

@@ -1,4 +1,4 @@
-package io.rndev.auth_data.network
+package io.rndev.auth_data
 
 import dagger.Binds
 import dagger.Module
@@ -29,7 +29,7 @@ internal abstract class BindsAuthDataModule {
 object ProvideRetrofitModule {
     @Provides
     @Singleton
-    fun provideAuthApi(retrofit: Retrofit): AuthApi {
-        return retrofit.create(AuthApi::class.java)
+    fun provideAuthApi(retrofit: Retrofit): AuthApiService {
+        return retrofit.create(AuthApiService::class.java)
     }
 }
