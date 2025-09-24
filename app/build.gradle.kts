@@ -34,6 +34,8 @@ dependencies {
     implementation(project(":features:account:account-presentation"))
     implementation(project(":features:account:account-domain"))
     implementation(project(":features:account:account-data"))
+    implementation(project(":core:common"))
+    implementation(project(":core:network"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

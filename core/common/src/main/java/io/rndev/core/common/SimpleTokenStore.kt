@@ -1,5 +1,5 @@
 // core/token/src/main/java/com/rndev/simulatorbank/core/token/SimpleTokenStore.kt
-package io.rndev.auth_data.network.token
+package io.rndev.core.common
 
 import android.content.Context
 import javax.inject.Inject

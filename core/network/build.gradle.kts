@@ -4,12 +4,10 @@ plugins {
     alias(libs.plugins.rndev.di.library)
 }
 
-android {
-    namespace = "io.rndev.auth_data"
+android{
+    namespace = "io.rndev.core.network"
 }
 
 dependencies {
-    implementation(project(":features:auth:auth-domain"))
-    implementation(project(":core:network"))
     implementation(project(":core:common"))
 }

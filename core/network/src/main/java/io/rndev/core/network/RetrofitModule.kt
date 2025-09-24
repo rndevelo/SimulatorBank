@@ -1,10 +1,10 @@
-package io.rndev.auth_data.network
+package io.rndev.core.network
 
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.rndev.auth_data.network.token.TokenProvider
+import io.rndev.core.common.TokenProvider
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
@@ -56,12 +56,12 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun provideAuthApi(json: Json, client: OkHttpClient): AuthApi {
+    fun provideAuthApi(json: Json, client: OkHttpClient): Retrofit {
+        val contentType = "application/json".toMediaType()
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(json.asConverterFactory(contentType))
             .build()
-            .create(AuthApi::class.java)
     }
 }

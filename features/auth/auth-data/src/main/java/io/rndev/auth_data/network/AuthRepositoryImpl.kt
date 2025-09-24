@@ -1,8 +1,8 @@
 package io.rndev.auth_data.network
 
-import io.rndev.auth_data.network.token.TokenProvider
 import io.rndev.auth_domain.AuthRepository
 import io.rndev.auth_domain.User
+import io.rndev.core.common.TokenProvider
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(

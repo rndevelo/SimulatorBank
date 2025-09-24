@@ -1,4 +1,4 @@
-package io.rndev.auth_data.network.token
+package io.rndev.core.common
 
 interface TokenProvider {
     fun getToken(): String?
