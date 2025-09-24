@@ -1,50 +1,48 @@
 package io.rndev.auth_presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.rndev.auth_domain.AuthUseCase
+import io.rndev.auth_domain.User
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 data class AuthUiState(
-    val username: String = "",
-    val password: String = "",
-    val loading: Boolean = false,
+    val isLoading: Boolean = false,
+    val user: User? = null,
     val error: String? = null
 )
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(
-//    private val repo: AuthRepository
-): ViewModel() {
+class AuthViewModel @Inject constructor(private val authUseCase: AuthUseCase) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState
 
-    fun onUsernameChanged(username: String) {
-        _uiState.value = _uiState.value.copy(username = username)
-    }
-
-    fun onPasswordChanged(password: String) {
-        _uiState.value = _uiState.value.copy(password = password)
-    }
-
-    fun login(onSuccess: () -> Unit) {
+    fun login(username: String, password: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(loading = true, error = null)
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
-//                val result = repo.login(_uiState.value.username, _uiState.value.password)
+                val result = authUseCase(username, password)
+
+                Log.d("UserAuthResult", "result: $result")
+
+                _uiState.value = _uiState.value.copy(user = result)
 //                if (result.isSuccess) {
 //                    onSuccess()
 //                } else {
 //                    _uiState.value = _uiState.value.copy(error = result.exceptionOrNull()?.message)
 //                }
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = e.localizedMessage ?: "Error desconocido")
+                _uiState.value =
+                    _uiState.value.copy(error = e.localizedMessage ?: "Error desconocido")
+                Log.d("UserAuthResult", "error: ${e.localizedMessage}")
             }
-            _uiState.value = _uiState.value.copy(loading = false)
+            _uiState.value = _uiState.value.copy(isLoading = false)
         }
     }
 }

@@ -10,8 +10,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.rndev.simulatorbank.features.auth.presentation.AuthScreen
 import dagger.hilt.android.AndroidEntryPoint
-import io.rndev.auth_presentation.AuthScreen
 import io.rndev.simulatorbank.ui.theme.SimulatorBankTheme
 
 @AndroidEntryPoint

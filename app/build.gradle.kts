@@ -1,7 +1,7 @@
 plugins {
-    id("io.github.rndevelo.buildlogic.android.application") version "1.0.3"
-    id("io.github.rndevelo.buildlogic.android.application.compose") version "1.0.3"
-    id("io.github.rndevelo.buildlogic.di.library.compose") version "1.0.3"
+    alias(libs.plugins.rndev.android.application)
+    alias(libs.plugins.rndev.android.application.compose)
+    alias(libs.plugins.rndev.di.library.compose)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint.gradle)
 }
@@ -29,6 +29,11 @@ android {
 
 dependencies {
     implementation(project(":features:auth:auth-presentation"))
+    implementation(project(":features:auth:auth-domain"))
+    implementation(project(":features:auth:auth-data"))
+    implementation(project(":features:account:account-presentation"))
+    implementation(project(":features:account:account-domain"))
+    implementation(project(":features:account:account-data"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

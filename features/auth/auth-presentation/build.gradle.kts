@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "io.rndev.auth_presentation"
 }
+
+dependencies {
+    implementation(project(":features:auth:auth-domain"))
+}
