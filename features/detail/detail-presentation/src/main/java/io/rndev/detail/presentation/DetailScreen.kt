@@ -118,11 +118,10 @@ fun AccountDetailItem(account: Account) {
 
 @Composable
 fun BalanceItem(balance: Balance) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text("${balance.amount} ${balance.currency}")
         Text(balance.creditDebitIndicator)
