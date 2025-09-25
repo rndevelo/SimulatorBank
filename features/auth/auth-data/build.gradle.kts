@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "io.rndev.auth_data"
+    namespace = "io.rndev.data"
 }
 
 dependencies {

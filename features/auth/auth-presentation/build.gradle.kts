@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "io.rndev.auth_presentation"
+    namespace = "io.rndev.presentation"
 }
 
 dependencies {

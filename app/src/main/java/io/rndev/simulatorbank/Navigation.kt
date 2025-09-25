@@ -8,8 +8,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import io.rndev.account_presentation.AccountsScreen
-import io.rndev.auth_presentation.AuthScreen
+import io.rndev.presentation.AccountsScreen
+import io.rndev.presentation.AuthScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
