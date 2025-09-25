@@ -10,12 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import io.rndev.domain.model.Account
+import io.rndev.domain.Account
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountsScreen(
-    accountsViewModel: AccountsViewModel = hiltViewModel()
+    accountsViewModel: AccountsViewModel = hiltViewModel(),
+    onAccountClick: (String) -> Unit = {}
 ) {
     val state by accountsViewModel.accountUiState.collectAsState()
 
@@ -44,7 +45,7 @@ fun AccountsScreen(
                     items(state!!.accounts, key = { it.id }) { account ->
                         AccountElegantItem(
                             account = account,
-                            onClick = { println("Clicked account: ${account.id}") }
+                            onClick = { onAccountClick(account.id) }
                         )
                     }
                 }
@@ -88,7 +89,7 @@ fun AccountElegantItem(
                     text = "${account.balance} ${account.currency}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = if (account.balance >= 0)
+                    color = if (account.balance.toDouble() >= 0)
                         MaterialTheme.colorScheme.primary
                     else
                         MaterialTheme.colorScheme.error

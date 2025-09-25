@@ -1,4 +1,4 @@
-package io.rndev.data.model
+package io.rndev.detail.data.model
 
 import kotlinx.serialization.Serializable
 

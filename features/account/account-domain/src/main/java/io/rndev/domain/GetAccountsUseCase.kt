@@ -1,10 +1,8 @@
-package io.rndev.domain.usecases
+package io.rndev.domain
 
-import io.rndev.domain.AccountRepository
-import io.rndev.domain.model.Account
+import io.rndev.domain.Account
 import javax.inject.Inject
 
 class GetAccountsUseCase @Inject constructor(private val repository: AccountRepository) {
     suspend operator fun invoke(): List<Account> = repository.getAccounts()
 }
-

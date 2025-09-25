@@ -1,6 +1,7 @@
 package io.rndev.simulatorbank
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -8,6 +9,11 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import io.rndev.detail.presentation.DetailScreen
+import io.rndev.detail.presentation.DetailViewModel
 import io.rndev.presentation.AccountsScreen
 import io.rndev.presentation.AuthScreen
 import kotlinx.serialization.Serializable
@@ -17,6 +23,9 @@ data object Auth : NavKey
 
 @Serializable
 data object Accounts : NavKey
+
+@Serializable
+data class Detail(val accountId: String) : NavKey
 
 @Composable
 fun Navigation() {
@@ -41,7 +50,19 @@ fun Navigation() {
                     )
                 }
                 entry<Accounts> {
-                    AccountsScreen()
+                    AccountsScreen(
+                        onAccountClick = { accountId ->
+                            backStack.add(Detail(accountId))
+                        }
+                    )
+                }
+                entry<Detail> { key ->
+                    val viewModel = hiltViewModel<DetailViewModel, DetailViewModel.Factory>(
+                        creationCallback = { factory ->
+                            factory.create(key.accountId)
+                        }
+                    )
+                    DetailScreen(viewModel = viewModel)
                 }
             },
     )

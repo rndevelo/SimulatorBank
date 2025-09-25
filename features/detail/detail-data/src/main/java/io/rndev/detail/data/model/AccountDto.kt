@@ -1,19 +1,19 @@
-package io.rndev.data.model
+package io.rndev.detail.data.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 // Accounts
 @Serializable
-data class AccountsResponseDto(
+data class AccountResponseDto(
     @SerialName("Data")
-    val data: AccountsDataDto
+    val data: AccountDataDto
 )
 
 @Serializable
-data class AccountsDataDto(
+data class AccountDataDto(
     @SerialName("Account")
-    val account: List<AccountDto>
+    val account: AccountDto
 )
 
 @Serializable
@@ -33,5 +33,6 @@ data class AccountDto(
     @SerialName("OpeningDate")
     val openingDate: String,
     @SerialName("Balance")
-    val balance: String
+    val balance: String,
 )
+
