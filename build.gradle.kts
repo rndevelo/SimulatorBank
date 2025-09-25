@@ -17,6 +17,7 @@ plugins {
 subprojects {
     plugins.withId("io.gitlab.arturbosch.detekt") {
         tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+            autoCorrect = true
             jvmTarget = "11"
             reports {
                 html.required.set(true)

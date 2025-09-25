@@ -32,6 +32,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://androidx.dev/snapshots/maven/") }
     }
 }
 
@@ -45,3 +46,6 @@ include(":features:account:account-data")
 include(":features:account:account-presentation")
 include(":core:network")
 include(":core:common")
+include(":features:detail:detail-domain")
+include(":features:detail:detail-presentation")
+include(":features:detail:detail-data")
