@@ -26,7 +26,7 @@ internal abstract class BindsAuthDataModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ProvideRetrofitModule {
+object ProvideAuthRetrofitModule {
     @Provides
     @Singleton
     fun provideAuthApi(retrofit: Retrofit): AuthApiService {

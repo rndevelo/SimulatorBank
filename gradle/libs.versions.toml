@@ -15,9 +15,9 @@ composeBom = "2025.09.00"
 lifecycleRuntimeKtx = "2.9.4"
 
 # Navigation 3
-nav3 = "1.0.0-alpha09"
-lifecycleViewModel = "1.0.0-SNAPSHOT"
-nav3Material = "1.0.0-SNAPSHOT"
+nav3 = "1.0.0-alpha10"
+lifecycleViewModel = "1.0.0-alpha10"   # si existe versión para ViewModel
+nav3Material = "1.0.0-alpha10"            # si lo hay para material3/adaptive
 
 # Serialization
 kotlinxSerialization = "1.9.0"

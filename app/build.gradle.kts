@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.rndev.di.library.compose)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint.gradle)
+    alias(libs.plugins.kotlinxSerialization)
 }
 
 android {
@@ -42,8 +43,10 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     //    Navigation3
-    implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
-    implementation(libs.androidx.material3.navigation3)
+
+//    implementation("androidx.navigation:navigation-runtime-ktx:2.9.5")
+//
+//    implementation("androidx.navigation:navigation-compose:3.1.3")
 }
