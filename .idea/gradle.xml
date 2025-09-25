@@ -11,6 +11,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/core/common" />
+            <option value="$PROJECT_DIR$/core/network" />
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/account" />
             <option value="$PROJECT_DIR$/features/account/account-data" />
@@ -20,6 +23,10 @@
             <option value="$PROJECT_DIR$/features/auth/auth-data" />
             <option value="$PROJECT_DIR$/features/auth/auth-domain" />
             <option value="$PROJECT_DIR$/features/auth/auth-presentation" />
+            <option value="$PROJECT_DIR$/features/detail" />
+            <option value="$PROJECT_DIR$/features/detail/detail-data" />
+            <option value="$PROJECT_DIR$/features/detail/detail-domain" />
+            <option value="$PROJECT_DIR$/features/detail/detail-presentation" />
           </set>
         </option>
       </GradleProjectSettings>
