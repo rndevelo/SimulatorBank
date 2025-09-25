@@ -58,6 +58,8 @@ coroutines = "1.10.2"
 
 # Build logic
 rndevBuildlogic = "1.0.8"
+appcompatVersion = "1.7.1"
+materialVersion = "1.13.0"
 
 [libraries]
 # AndroidX
@@ -116,6 +118,8 @@ androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "
 # Gradle Plugins
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompatVersion" }
+material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
