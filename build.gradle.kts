@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.ksp) apply false // Asegurado que está activo (probable dependencia para DI)
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.kotlin.kapt) apply false
-    alias(libs.plugins.kotlinxSerialization) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.ktlint.gradle) apply false
 }
@@ -17,7 +16,6 @@ plugins {
 subprojects {
     plugins.withId("io.gitlab.arturbosch.detekt") {
         tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
-            autoCorrect = true
             jvmTarget = "11"
             reports {
                 html.required.set(true)

@@ -1,14 +1,9 @@
 plugins {
-    alias(libs.plugins.rndev.android.feature)
-    alias(libs.plugins.rndev.di.library.compose)
-    alias(libs.plugins.detekt)
-    alias(libs.plugins.ktlint.gradle)
+    id("io.github.rndevelo.buildlogic.android.feature") version "1.0.3"
 }
 
 android {
-    namespace = "io.rndev.presentation"
+    namespace = "io.rndev.account_presentation"
 }
 
-dependencies {
-    implementation(project(":features:account:account-domain"))
-}
+
