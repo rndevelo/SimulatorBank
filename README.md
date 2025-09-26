@@ -1,4 +1,12 @@
-# Simulator Bank
+# 🏦 Simulator Bank  
+
+![Kotlin](https://img.shields.io/badge/Kotlin-1.9-blueviolet?logo=kotlin&logoColor=white)  
+![Compose](https://img.shields.io/badge/Jetpack%20Compose-%20UI-blue?logo=jetpackcompose&logoColor=white)  
+![Architecture](https://img.shields.io/badge/Architecture-Clean%20%7C%20MVVM-green)  
+![Detekt](https://img.shields.io/badge/Code%20Quality-Detekt-orange)  
+![Lint](https://img.shields.io/badge/Lint-Ktlint-yellow)  
+![Testing](https://img.shields.io/badge/Testing-JUnit%20%7C%20MockK%20%7C%20Turbine-lightgrey)  
+![License](https://img.shields.io/badge/License-MIT-brightgreen)  
 
 Aplicación bancaria simulada, organizada bajo un enfoque **modular, escalable y mantenible**.  
 Implementa **Clean Architecture**, **MVVM**, **Jetpack Compose**, **Retrofit**, **Mockoon**, **Detekt**, **Testing** y buenas prácticas de accesibilidad.
@@ -42,7 +50,7 @@ El proyecto está pensado como **entorno de aprendizaje y demostración**, aplic
 - **Clean Architecture**: separación clara entre capas (data, domain, presentation).  
 - **Modularización por features**: cada funcionalidad en su propio módulo independiente.  
 - **MVVM**: patrón de presentación para desacoplar lógica de UI.  
-- **Inyección de dependencias**: Hilt / Koin.  
+- **Inyección de dependencias**: Hilt.  
 - **UI declarativa con Jetpack Compose**.  
 - **Networking con Retrofit + interceptores**.  
 - **Mockeo de backend con Mockoon**.  
@@ -59,14 +67,15 @@ El proyecto está pensado como **entorno de aprendizaje y demostración**, aplic
 /config
 /features
     ├── feature-auth
-    │     ├── data        # repositorios, fuentes remotas/locales, mappers
-    │     ├── domain      # casos de uso, entidades
+    │     ├── data         # repositorios, fuentes remotas/locales, mappers
+    │     ├── domain       # casos de uso, entidades
     │     └── presentation # UI (Compose), ViewModels
     ├── feature-accounts
     └── feature-detail
 /common
 /core
-    ├── network           # Retrofit, interceptores
-    ├── di                # módulos de inyección globales
-    ├── util              # extensiones, helpers
-    └── testing           # utilidades para tests
+    ├── network            # Retrofit, interceptores
+    ├── di                 # módulos de inyección globales
+    ├── util               # extensiones, helpers
+    └── testing            # utilidades para tests
+
