@@ -58,19 +58,13 @@ El proyecto está pensado como **entorno de aprendizaje y demostración**, aplic
 /app
 /config
 /features
-    ├── feature-login
+    ├── feature-auth
     │     ├── data        # repositorios, fuentes remotas/locales, mappers
     │     ├── domain      # casos de uso, entidades
     │     └── presentation # UI (Compose), ViewModels
     ├── feature-accounts
-    ├── feature-transfers
-    ├── feature-history
-    └── feature-profile
+    └── feature-detail
 /common
-    ├── data
-    ├── domain
-    ├── ui                # componentes y temas reutilizables
-    └── navigation
 /core
     ├── network           # Retrofit, interceptores
     ├── di                # módulos de inyección globales
