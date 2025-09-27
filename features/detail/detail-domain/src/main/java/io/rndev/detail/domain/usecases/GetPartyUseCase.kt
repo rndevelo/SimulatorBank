@@ -5,5 +5,5 @@ import io.rndev.detail.domain.model.Party
 import javax.inject.Inject
 
 class GetPartyUseCase @Inject constructor(private val repository: DetailRepository) {
-    suspend operator fun invoke(): Party = repository.getParty()
+    suspend operator fun invoke(): Result<Party> = repository.getParty()
 }

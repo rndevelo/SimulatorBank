@@ -5,6 +5,6 @@ import io.rndev.detail.domain.model.Transaction
 import javax.inject.Inject
 
 class GetTransactionsUseCase @Inject constructor(private val repository: DetailRepository) {
-    suspend operator fun invoke(accountId: String): List<Transaction> =
+    suspend operator fun invoke(accountId: String): Result<List<Transaction>> =
         repository.getTransactions(accountId)
 }

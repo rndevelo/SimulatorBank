@@ -12,6 +12,5 @@ android {
 
 dependencies {
     implementation(project(":features:auth:auth-domain"))
-    implementation(project(":core:network"))
     implementation(project(":core:common"))
 }

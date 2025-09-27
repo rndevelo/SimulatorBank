@@ -1,6 +1,6 @@
 package io.rndev.domain
 
-sealed class AuthException(message: String? = null, cause: Throwable? = null) : Throwable(message, cause) {
+sealed class AccountsException(message: String? = null, cause: Throwable? = null) : Throwable(message, cause) {
     // Errores de Red/Conexión
     data class NetworkError(override val cause: Throwable? = null) : Exception("Error de red. Verifica tu conexión.")
     data class ServerError(val errorCode: Int, val errorMessage: String?) : Exception("Error del servidor: $errorCode - $errorMessage")

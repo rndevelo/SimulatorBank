@@ -11,4 +11,5 @@ android {
 
 dependencies {
     implementation(project(":features:account:account-domain"))
+    implementation(project(":core:common"))
 }

@@ -60,6 +60,7 @@ coroutines = "1.10.2"
 rndevBuildlogic = "1.0.8"
 appcompatVersion = "1.7.1"
 materialVersion = "1.13.0"
+cronetApi = "141.7340.3"
 
 [libraries]
 # AndroidX
@@ -120,6 +121,7 @@ android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", ver
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompatVersion" }
 material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
+cronet-api = { group = "org.chromium.net", name = "cronet-api", version.ref = "cronetApi" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

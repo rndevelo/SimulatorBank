@@ -13,7 +13,7 @@ data class AccountsResponseDto(
 @Serializable
 data class AccountsDataDto(
     @SerialName("Account")
-    val account: List<AccountDto>
+    val accounts: List<AccountDto>
 )
 
 @Serializable

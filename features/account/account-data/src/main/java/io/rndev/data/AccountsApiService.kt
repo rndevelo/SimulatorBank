@@ -1,10 +1,11 @@
 package io.rndev.data
 
 import io.rndev.data.model.AccountsResponseDto
+import retrofit2.Response
 import retrofit2.http.GET
 
-interface AccountApiService {
+interface AccountsApiService {
 
     @GET("accounts")
-    suspend fun getAccounts(): AccountsResponseDto
+    suspend fun getAccounts(): Response<AccountsResponseDto>
 }

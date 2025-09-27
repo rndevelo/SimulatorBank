@@ -1,12 +1,23 @@
 package io.rndev.detail.presentation
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
@@ -15,28 +26,36 @@ import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-// Models are only needed in the screen-level composable to extract data
+import io.rndev.core.common.ErrorState
+import io.rndev.core.common.getBalanceColor
 import io.rndev.detail.domain.model.Account
 import io.rndev.detail.domain.model.Balance
 import io.rndev.detail.domain.model.Transaction
-
-// Original getAmountColor from DetailScreen, might need adjustment based on parameter type
-fun getAmountColor(isPositiveOrCredit: Boolean, isZero: Boolean = false): Color {
-    return if (isZero) Color.Gray
-    else if (isPositiveOrCredit) Color(0xFF008000) // Dark Green
-    else Color(0xFFD32F2F) // Dark Red
-}
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,6 +97,7 @@ fun DetailScreen(
                         transactions = state.transactions // Pass the full transaction list
                     )
                 }
+
                 else -> ErrorState(message = "No se encontraron datos de la cuenta.")
             }
         }
@@ -101,7 +121,8 @@ fun AccountDetailContent(
                 accountSubType = account.subType,
                 currentBalanceDisplay = account.balance, // balance is already a String
                 currency = account.currency,
-                openingDateText = account.openingDate.split("T").firstOrNull() ?: account.openingDate,
+                openingDateText = account.openingDate.split("T").firstOrNull()
+                    ?: account.openingDate,
                 accountDescriptionText = account.description,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp)
             )
@@ -112,7 +133,12 @@ fun AccountDetailContent(
             item {
                 SectionTitle(
                     title = "Saldos de la Cuenta",
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 20.dp,
+                        bottom = 8.dp
+                    )
                 )
             }
             items(balances, key = { it.type + it.currency }) { balance ->
@@ -134,14 +160,20 @@ fun AccountDetailContent(
             item {
                 SectionTitle(
                     title = "Movimientos Recientes",
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 20.dp,
+                        bottom = 8.dp
+                    )
                 )
             }
             items(transactions, key = { it.transactionId }) { transaction ->
                 val isCredit = transaction.creditDebitIndicator.equals("Credit", ignoreCase = true)
                 TransactionRow(
                     descriptionText = transaction.description,
-                    bookingDateText = transaction.bookingDateTime.split("T").firstOrNull() ?: transaction.bookingDateTime,
+                    bookingDateText = transaction.bookingDateTime.split("T").firstOrNull()
+                        ?: transaction.bookingDateTime,
                     amountValue = transaction.amount, // Double
                     currencyCode = transaction.currency,
                     isCredit = isCredit,
@@ -149,7 +181,10 @@ fun AccountDetailContent(
                     modifier = Modifier // Pass modifier if TransactionRow defines it
                 )
                 if (transactions.last() != transaction) {
-                    HorizontalDivider(modifier = Modifier.padding(start = 72.dp, end = 16.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+                    HorizontalDivider(
+                        modifier = Modifier.padding(start = 72.dp, end = 16.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                    )
                 }
             }
         } else {
@@ -208,18 +243,19 @@ fun AccountHeader(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Row {
-                    val balanceValue = currentBalanceDisplay.replace(",", "").toDoubleOrNull() ?: 0.0
+                    val balanceValue =
+                        currentBalanceDisplay.replace(",", "").toDoubleOrNull() ?: 0.0
                     Text(
                         text = currentBalanceDisplay,
                         style = MaterialTheme.typography.displaySmall.copy(fontSize = 32.sp),
                         fontWeight = FontWeight.ExtraBold,
-                        color = getAmountColor(balanceValue > 0.0, balanceValue == 0.0)
+                        color = getBalanceColor(balanceValue)
                     )
                     Text(
                         text = currency,
                         style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
                         fontWeight = FontWeight.SemiBold,
-                        color = getAmountColor(balanceValue > 0.0, balanceValue == 0.0).copy(alpha = 0.8f),
+                        color = getBalanceColor(balanceValue),
                         modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
                     )
                 }
@@ -252,6 +288,7 @@ fun AccountHeader(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun BalanceCard(
     balanceType: String,
@@ -292,17 +329,22 @@ fun BalanceCard(
                 )
             }
             Spacer(modifier = Modifier.width(12.dp))
-            val isCredit = creditDebitIndicatorText.equals("Credit", ignoreCase = true)
             Text(
-                text = "${String.format("%.2f", amountValue)} $currencyCode", // Format Double to String
+                text = "${
+                    String.format(
+                        "%.2f",
+                        amountValue
+                    )
+                } $currencyCode", // Format Double to String
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = getAmountColor(isCredit && amountValue != 0.0, amountValue == 0.0)
+                color = getBalanceColor(amountValue),
             )
         }
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun TransactionRow(
     descriptionText: String?,
@@ -313,15 +355,17 @@ fun TransactionRow(
     // onClick: () -> Unit = {}, // Add if click action is needed for the row
     modifier: Modifier = Modifier
 ) {
-    val amountColor = getAmountColor(isCredit && amountValue != 0.0, amountValue == 0.0)
-    val transactionIcon = if (isCredit) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown
-    // val formattedAmount = (if (isCredit && amountValue != 0.0) "+" else if (!isCredit && amountValue != 0.0) "-" else "") + String.format("%.2f", amountValue)
-     val sign = when {
+
+    val amountColor = getBalanceColor(amountValue)
+    val transactionIcon =
+        if (isCredit) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown
+    val sign = when {
         amountValue == 0.0 -> ""
         isCredit -> "+"
         else -> "-"
     }
-    val formattedAmount = sign + String.format("%.2f", Math.abs(amountValue)) // Show absolute amount with sign
+    val formattedAmount =
+        sign + String.format("%.2f", abs(amountValue)) // Show absolute amount with sign
 
     Row(
         modifier = modifier
@@ -404,27 +448,21 @@ fun SectionTitle(title: String, modifier: Modifier = Modifier) {
     )
 }
 
-@Composable
-fun ErrorState(message: String, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = Icons.Filled.ErrorOutline,
-            contentDescription = "Error",
-            tint = MaterialTheme.colorScheme.error,
-            modifier = Modifier.size(64.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = message,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.error
-        )
-    }
-}
+
+//@Preview(showBackground = true)
+//@Composable
+//fun AccountDetailContentPreview() {
+//    AccountDetailContent(
+//        account = Account(),
+//        balances = listOf(Balance(currency = "USD", amount = 1000.0)),
+//        transactions = listOf(
+//            Transaction(
+//                transactionId = "1",
+//                date = "2023-10-01",
+//                description = "Purchase",
+//                amount = -50.0
+//            ),
+//            Transaction(transactionId = "2", date = "2023")
+//        )
+//    )
+//}
