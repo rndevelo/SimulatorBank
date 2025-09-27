@@ -1,35 +1,35 @@
-package io.rndev.data
+package io.rndev.detail.data
 
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.rndev.domain.AccountsRepository
+import io.rndev.detail.domain.DetailRepository
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal abstract class BindsAccountDataModule {
+internal abstract class BindsDetailDataModule {
 
     @Binds
     abstract fun bindRemoteAuthDataSource(
-        remoteDataSource: AccountRemoteDataSourceImpl
-    ): AccountRemoteDataSource
+        remoteDataSource: DetailRemoteDataSourceImpl
+    ): DetailRemoteDataSource
 
     @Binds
     abstract fun bindAuthRepository(
-        repository: AccountsRepositoryImpl
-    ): AccountsRepository
+        repository: DetailRepositoryImpl
+    ): DetailRepository
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ProvideAccountRetrofitModule {
+object ProvideDetailRetrofitModule {
     @Provides
     @Singleton
-    fun provideAuthApi(retrofit: Retrofit): AccountsApiService {
-        return retrofit.create(AccountsApiService::class.java)
+    fun provideAuthApi(retrofit: Retrofit): DetailApiService {
+        return retrofit.create(DetailApiService::class.java)
     }
 }

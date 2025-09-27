@@ -1,21 +1,23 @@
-package io.rndev.presentation // o io.rndev.account_presentation.accounts
+package io.rndev.presentation
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.rndev.domain.model.Account
-import io.rndev.domain.usecases.GetAccountsUseCase
+import io.rndev.domain.Account
+import io.rndev.domain.GetAccountsUseCase
+import io.rndev.domain.AccountsException // Asumiendo que esta es la clase de excepción relevante del dominio
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class AccountUiState(
-    val isLoading: Boolean,
-    val accounts: List<Account>,
-    val error: String?,
+    val isLoading: Boolean = true, // Valor inicial por defecto
+    val accounts: List<Account> = emptyList(),
+    val error: String? = null,
 )
 
 @HiltViewModel
@@ -23,65 +25,49 @@ class AccountsViewModel @Inject constructor(
     private val getAccountsUseCase: GetAccountsUseCase
 ) : ViewModel() {
 
-    private val _accountUiState =
-        MutableStateFlow(
-            AccountUiState(
-                isLoading = true,
-                accounts = emptyList(),
-                error = null
-            )
-        )
-
-    val accountUiState: StateFlow<AccountUiState?> = _accountUiState
+    private val _accountUiState = MutableStateFlow(AccountUiState()) // Estado inicial con isLoading = true
+    val accountUiState: StateFlow<AccountUiState> = _accountUiState.asStateFlow()
 
     init {
         loadAccounts()
     }
 
-    fun loadAccounts() = viewModelScope.launch {
-        _accountUiState.update {
-            it.copy(isLoading = true)
-        }
-        try {
-            val accounts = getAccountsUseCase()
-            Log.d("AccountsViewModel", "loadAccounts: accounts = $accounts")
+    fun loadAccounts() {
+        viewModelScope.launch {
+            _accountUiState.update {
+                it.copy(isLoading = true, error = null) // Resetear error en cada carga
+            }
 
-            _accountUiState.update {
-                it.copy(isLoading = false, accounts = accounts)
-            }
-        } catch (e: Exception) {
-            _accountUiState.update {
-                it.copy(isLoading = false, error = e.message)
-            }
+            getAccountsUseCase()
+                .onSuccess { fetchedAccounts ->
+                    Log.d("AccountsViewModel", "loadAccounts successful: ${fetchedAccounts.size} accounts")
+                    _accountUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            accounts = fetchedAccounts,
+                            error = null
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    Log.e("AccountsViewModel", "loadAccounts failed", throwable)
+                    // Aquí podrías tener un mapeo de errores más sofisticado como en AuthViewModel
+                    // Por ahora, usamos el mensaje del throwable o un mensaje genérico.
+                    val errorMessage = when (throwable) {
+                        is AccountsException.InvalidCredentials -> "Error de credenciales (aunque raro para cuentas)"
+                        is AccountsException.NetworkError -> "Error de red. Revisa tu conexión."
+                        is AccountsException.ServerError -> "Error del servidor (${throwable.errorCode}). Intenta más tarde."
+                        is AccountsException.UserNotFound -> "Usuario no encontrado (raro para cuentas)"
+                        else -> throwable.localizedMessage ?: "Ocurrió un error desconocido al cargar las cuentas."
+                    }
+                    _accountUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = errorMessage,
+                            accounts = emptyList() // Mantener la lista vacía en caso de error
+                        )
+                    }
+                }
         }
     }
 }
-
-
-//class TransactionsViewModel(private val getTransactionsUseCase: GetTransactionsUseCase) : ViewModel() {
-//    private val _uiState = MutableStateFlow<TransactionsUiState>(TransactionsUiState.Loading)
-//    val uiState: StateFlow<TransactionsUiState> = _uiState
-//
-//    fun loadTransactions(accountId: String) = viewModelScope.launch {
-//        try {
-//            val txns = getTransactionsUseCase(accountId)
-//            _uiState.value = TransactionsUiState.Success(txns)
-//        } catch (e: Exception) {
-//            _uiState.value = TransactionsUiState.Error(e)
-//        }
-//    }
-//}
-//
-//class SandboxViewModel(private val sandboxUseCase: SandboxOperationUseCase) : ViewModel() {
-//    private val _uiState = MutableStateFlow<SandboxUiState>(SandboxUiState.Idle)
-//    val uiState: StateFlow<SandboxUiState> = _uiState
-//
-//    fun executeOperation(request: SandboxRequest) = viewModelScope.launch {
-//        _uiState.value = SandboxUiState.Loading
-//        val result = sandboxUseCase(request)
-//        _uiState.value = when(result) {
-//            is SandboxResult.Success -> SandboxUiState.Success
-//            is SandboxResult.Failure -> SandboxUiState.Error(result.message)
-//        }
-//    }
-//}

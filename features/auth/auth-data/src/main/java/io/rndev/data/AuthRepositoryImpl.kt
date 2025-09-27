@@ -1,10 +1,10 @@
 package io.rndev.data
 
-import io.rndev.domain.AuthException
+import io.rndev.core.common.TokenProvider
 import io.rndev.domain.AuthRepository
 import io.rndev.domain.User
-import io.rndev.core.common.TokenProvider
 import javax.inject.Inject
+import io.rndev.domain.AuthException
 
 class AuthRepositoryImpl @Inject constructor(
     private val authDt: AuthRemoteDataSource,
@@ -23,8 +23,11 @@ class AuthRepositoryImpl @Inject constructor(
         }.recoverCatching { throwable ->
             // Si el mapeo a DomainModel falla (aunque es raro si el DTO es correcto),
             // o si quieres convertir cualquier Throwable no-AuthException a uno.
-            if (throwable is AuthException) throw throwable
-            else throw AuthException.UnknownError("Error al procesar la respuesta del servidor.", throwable)
+            if (throwable is Exception) throw throwable
+            else throw AuthException.UnknownError(
+                "Error al procesar la respuesta del servidor.",
+                throwable
+            )
         }
     }
 }

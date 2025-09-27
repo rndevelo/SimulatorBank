@@ -35,6 +35,9 @@ dependencies {
     implementation(project(":features:account:account-presentation"))
     implementation(project(":features:account:account-domain"))
     implementation(project(":features:account:account-data"))
+    implementation(project(":features:detail:detail-presentation"))
+    implementation(project(":features:detail:detail-domain"))
+    implementation(project(":features:detail:detail-data"))
     implementation(project(":core:common"))
     implementation(project(":core:network"))
 

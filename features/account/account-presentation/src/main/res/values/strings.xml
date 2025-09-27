@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">SimulatorBank</string>
     <string name="account_screen_title">Mis Cuentas</string>
     <string name="generic_error_prefix">Error: </string>
     <string name="accounts_empty_list">No hay cuentas para mostrar.</string>

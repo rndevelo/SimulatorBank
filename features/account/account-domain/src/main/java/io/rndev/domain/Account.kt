@@ -1,4 +1,4 @@
-package io.rndev.domain.model
+package io.rndev.domain
 
 data class Account(
     val id: String,
@@ -8,5 +8,5 @@ data class Account(
     val description: String?,
     val nickname: String?,
     val openingDate: String,
-    val balance: Double,      // Nuevo campo para mostrar saldo
+    val balance: String,      // Nuevo campo para mostrar saldo
 )

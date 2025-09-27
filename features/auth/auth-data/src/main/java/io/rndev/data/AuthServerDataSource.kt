@@ -1,8 +1,8 @@
 package io.rndev.data // O tu paquete
 
-import io.rndev.domain.AuthException // Importa tu AuthException
+import io.rndev.domain.AuthException
 import java.io.IOException
-import javax.inject.Inject // Si usas Hilt/Dagger
+import javax.inject.Inject
 
 class AuthServerDataSource @Inject constructor(
     private val authApiService: AuthApiService
@@ -30,7 +30,7 @@ class AuthServerDataSource @Inject constructor(
         private const val SERVICE_UNAVAILABLE = 503
     }
 
-    private fun mapError(code: Int, message: String?): AuthException {
+    private fun mapError(code: Int, message: String?): Exception {
         return when (code) {
             UNAUTHORIZED -> AuthException.InvalidCredentials
             NOT_FOUND -> AuthException.UserNotFound

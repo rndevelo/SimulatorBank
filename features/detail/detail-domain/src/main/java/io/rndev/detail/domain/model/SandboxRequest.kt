@@ -1,4 +1,4 @@
-package io.rndev.domain.model
+package io.rndev.detail.domain.model
 
 // Sandbox operation
 data class SandboxRequest(

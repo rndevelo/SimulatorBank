@@ -36,18 +36,9 @@ class AuthViewModel @Inject constructor(private val authUseCase: AuthUseCase) : 
                 .onFailure { throwable ->
                     val authError = throwable as? AuthException
                         ?: AuthException.UnknownError("Error inesperado en ViewModel", throwable)
-                    val userFriendlyMessage = getUserFriendlyMessage(authError)
-                    _eventChannel.send(AuthUiEvent.Error(userFriendlyMessage))
+                    _eventChannel.send(AuthUiEvent.Error(authError.message ?: "Error desconocido"))
                 }
         }
     }
 }
 
-private fun getUserFriendlyMessage(exception: AuthException): String {
-    return when (exception) {
-        is AuthException.NetworkError -> "Error de red. Revisa tu conexión."
-        is AuthException.InvalidCredentials -> "Credenciales incorrectas."
-        is AuthException.ServerError -> "Error del servidor (${exception.errorCode}). Intenta más tarde."
-        else -> exception.message ?: "Ocurrió un error desconocido."
-    }
-}

@@ -1,4 +1,4 @@
-package io.rndev.domain.model
+package io.rndev.detail.domain.model
 
 // Party
 data class Party(
