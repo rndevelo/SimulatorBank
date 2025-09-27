@@ -28,6 +28,7 @@ class DetailRepositoryImpl @Inject constructor(
     override suspend fun getTransactions(accountId: String): List<Transaction> =
         dataSource.getTransactions(accountId).map { dto ->
             Transaction(
+                transactionId = dto.transactionId, // <-- AÑADIDO AQUÍ
                 accountId = dto.accountId,
                 amount = dto.amount.amount.toDoubleOrNull() ?: 0.0,
                 currency = dto.amount.currency,

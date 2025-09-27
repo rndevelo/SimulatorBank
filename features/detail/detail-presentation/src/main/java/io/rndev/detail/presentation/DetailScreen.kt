@@ -1,31 +1,66 @@
 package io.rndev.detail.presentation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+// Models are only needed in the screen-level composable to extract data
 import io.rndev.detail.domain.model.Account
 import io.rndev.detail.domain.model.Balance
 import io.rndev.detail.domain.model.Transaction
 
+// Original getAmountColor from DetailScreen, might need adjustment based on parameter type
+fun getAmountColor(isPositiveOrCredit: Boolean, isZero: Boolean = false): Color {
+    return if (isZero) Color.Gray
+    else if (isPositiveOrCredit) Color(0xFF008000) // Dark Green
+    else Color(0xFFD32F2F) // Dark Red
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
-    viewModel: DetailViewModel
+    viewModel: DetailViewModel, // Assuming DetailViewModel provides the state
+    onNavigateBack: () -> Unit // Callback for back navigation
 ) {
     val state by viewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalle de Cuenta", style = MaterialTheme.typography.titleLarge) }
+                title = { Text(state.account?.nickname ?: "Detalle de Cuenta") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                )
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -35,81 +70,98 @@ fun DetailScreen(
         ) {
             when {
                 state.isLoading -> CircularProgressIndicator()
-                state.error != null -> Text("Error: ${state.error}")
+                state.error != null -> ErrorState(message = "Error: ${state.error}")
                 state.account != null -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        // Account info
-                        item {
-                            AccountDetailItem(account = state.account!!)
-                        }
-
-                        // Balances
-                        item {
-                            Text(
-                                text = "Balances",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            state.balances.forEach { balance ->
-                                BalanceItem(balance)
-                            }
-                        }
-
-                        // Transactions
-                        item {
-                            Text(
-                                text = "Transacciones",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
-                        }
-                        items(state.transactions) { transaction ->
-                            TransactionItem(transaction)
-                        }
-                    }
+                    AccountDetailContent(
+                        account = state.account!!, // Pass the full account object here
+                        balances = state.balances,   // Pass the full balance list
+                        transactions = state.transactions // Pass the full transaction list
+                    )
                 }
-                else -> Text("No se encontraron datos de la cuenta.")
+                else -> ErrorState(message = "No se encontraron datos de la cuenta.")
             }
         }
     }
 }
 
 @Composable
-fun AccountDetailItem(account: Account) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+fun AccountDetailContent(
+    account: Account, // Still receiving the full object to extract data
+    balances: List<Balance>,
+    transactions: List<Transaction>
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 16.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = account.nickname ?: "Cuenta sin nombre",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
+        item {
+            AccountHeader(
+                nickname = account.nickname,
+                accountType = account.type,
+                accountSubType = account.subType,
+                currentBalanceDisplay = account.balance, // balance is already a String
+                currency = account.currency,
+                openingDateText = account.openingDate.split("T").firstOrNull() ?: account.openingDate,
+                accountDescriptionText = account.description,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp)
             )
-            Text(
-                text = account.description ?: "",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(Modifier.height(8.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Tipo: ${account.type}", style = MaterialTheme.typography.bodySmall)
-                Text("Subtipo: ${account.subType}", style = MaterialTheme.typography.bodySmall)
-                Text("Desde: ${account.openingDate}", style = MaterialTheme.typography.bodySmall)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+        }
+
+        if (balances.isNotEmpty()) {
+            item {
+                SectionTitle(
+                    title = "Saldos de la Cuenta",
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 8.dp)
+                )
+            }
+            items(balances, key = { it.type + it.currency }) { balance ->
+                BalanceCard(
+                    balanceType = balance.type,
+                    creditDebitIndicatorText = balance.creditDebitIndicator,
+                    amountValue = balance.amount, // Double
+                    currencyCode = balance.currency,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                )
+            }
+            item {
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            }
+        }
+
+        if (transactions.isNotEmpty()) {
+            item {
+                SectionTitle(
+                    title = "Movimientos Recientes",
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 8.dp)
+                )
+            }
+            items(transactions, key = { it.transactionId }) { transaction ->
+                val isCredit = transaction.creditDebitIndicator.equals("Credit", ignoreCase = true)
+                TransactionRow(
+                    descriptionText = transaction.description,
+                    bookingDateText = transaction.bookingDateTime.split("T").firstOrNull() ?: transaction.bookingDateTime,
+                    amountValue = transaction.amount, // Double
+                    currencyCode = transaction.currency,
+                    isCredit = isCredit,
+                    // onClick = { /* Define action if needed */ }
+                    modifier = Modifier // Pass modifier if TransactionRow defines it
+                )
+                if (transactions.last() != transaction) {
+                    HorizontalDivider(modifier = Modifier.padding(start = 72.dp, end = 16.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+                }
+            }
+        } else {
+            item {
                 Text(
-                    text = "${account.balance} ${account.currency}",
-                    fontWeight = FontWeight.Bold,
-                    color = if (!account.balance.contains("-")) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.error
+                    "No hay movimientos recientes.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 32.dp)
                 )
             }
         }
@@ -117,43 +169,262 @@ fun AccountDetailItem(account: Account) {
 }
 
 @Composable
-fun BalanceItem(balance: Balance) {
+fun AccountHeader(
+    nickname: String?,
+    accountType: String,
+    accountSubType: String,
+    currentBalanceDisplay: String, // Already a String from domain model
+    currency: String,
+    openingDateText: String, // Pre-formatted date string
+    accountDescriptionText: String?,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.Start
     ) {
-        Text("${balance.amount} ${balance.currency}")
-        Text(balance.creditDebitIndicator)
-        Text(balance.type)
+        Text(
+            text = nickname ?: "Nombre de Cuenta no disponible",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "$accountType - $accountSubType",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column {
+                Text(
+                    text = "Saldo Actual",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Row {
+                    val balanceValue = currentBalanceDisplay.replace(",", "").toDoubleOrNull() ?: 0.0
+                    Text(
+                        text = currentBalanceDisplay,
+                        style = MaterialTheme.typography.displaySmall.copy(fontSize = 32.sp),
+                        fontWeight = FontWeight.ExtraBold,
+                        color = getAmountColor(balanceValue > 0.0, balanceValue == 0.0)
+                    )
+                    Text(
+                        text = currency,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
+                        fontWeight = FontWeight.SemiBold,
+                        color = getAmountColor(balanceValue > 0.0, balanceValue == 0.0).copy(alpha = 0.8f),
+                        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+                    )
+                }
+            }
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = "Apertura",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = openingDateText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        accountDescriptionText?.let {
+            if (it.isNotBlank()) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
     }
 }
 
 @Composable
-fun TransactionItem(transaction: Transaction) {
+fun BalanceCard(
+    balanceType: String,
+    creditDebitIndicatorText: String,
+    amountValue: Double,
+    currencyCode: String,
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(
-                text = transaction.description ?: "Sin descripción",
-                style = MaterialTheme.typography.bodyMedium
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.AccountBalanceWallet,
+                contentDescription = "Tipo de Saldo",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(28.dp)
             )
-            Spacer(Modifier.height(4.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Monto: ${transaction.amount} ${transaction.currency}")
-                Text(transaction.creditDebitIndicator)
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = balanceType,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = creditDebitIndicatorText.replaceFirstChar { it.titlecase() },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
-            Text("Referencia: ${transaction.reference}", style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.width(12.dp))
+            val isCredit = creditDebitIndicatorText.equals("Credit", ignoreCase = true)
             Text(
-                "Fecha: ${transaction.bookingDateTime}",
-                style = MaterialTheme.typography.bodySmall
+                text = "${String.format("%.2f", amountValue)} $currencyCode", // Format Double to String
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = getAmountColor(isCredit && amountValue != 0.0, amountValue == 0.0)
             )
         }
+    }
+}
+
+@Composable
+fun TransactionRow(
+    descriptionText: String?,
+    bookingDateText: String,
+    amountValue: Double,
+    currencyCode: String,
+    isCredit: Boolean, // Derived from creditDebitIndicator
+    // onClick: () -> Unit = {}, // Add if click action is needed for the row
+    modifier: Modifier = Modifier
+) {
+    val amountColor = getAmountColor(isCredit && amountValue != 0.0, amountValue == 0.0)
+    val transactionIcon = if (isCredit) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown
+    // val formattedAmount = (if (isCredit && amountValue != 0.0) "+" else if (!isCredit && amountValue != 0.0) "-" else "") + String.format("%.2f", amountValue)
+     val sign = when {
+        amountValue == 0.0 -> ""
+        isCredit -> "+"
+        else -> "-"
+    }
+    val formattedAmount = sign + String.format("%.2f", Math.abs(amountValue)) // Show absolute amount with sign
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { /* onClick() */ } // Call onClick if defined and needed
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(amountColor.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = transactionIcon,
+                contentDescription = if (isCredit) "Ingreso" else "Egreso",
+                tint = amountColor,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = descriptionText ?: "Sin descripción",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.CalendarToday,
+                    contentDescription = "Fecha",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(12.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = bookingDateText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                text = formattedAmount,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = amountColor
+            )
+            Text(
+                text = currencyCode,
+                style = MaterialTheme.typography.labelSmall,
+                color = amountColor.copy(alpha = 0.7f)
+            )
+        }
+        Icon(
+            imageVector = Icons.Filled.ChevronRight,
+            contentDescription = "Ver detalle",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
+
+@Composable
+fun SectionTitle(title: String, modifier: Modifier = Modifier) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onSurface, // More prominent than onSurfaceVariant
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ErrorState(message: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = Icons.Filled.ErrorOutline,
+            contentDescription = "Error",
+            tint = MaterialTheme.colorScheme.error,
+            modifier = Modifier.size(64.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = message,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.error
+        )
     }
 }

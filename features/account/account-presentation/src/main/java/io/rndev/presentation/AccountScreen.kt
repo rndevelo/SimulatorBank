@@ -1,16 +1,45 @@
 package io.rndev.presentation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+// import androidx.compose.ui.graphics.vector.ImageVector // No se usa directamente aquí
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import io.rndev.domain.Account
+// import androidx.compose.ui.unit.sp // No se usa directamente aquí
+import androidx.hilt.navigation.compose.hiltViewModel
+import io.rndev.domain.Account // Necesario para extraer los datos
+
+// Helper de AccountScreen (similar al de DetailScreen)
+fun getAccountBalanceColor(balance: String?): Color {
+    if (balance == null) return Color.Gray
+    return try {
+        val numericBalance = balance.replace(",", "").toDoubleOrNull() ?: 0.0
+        when {
+            numericBalance > 0.0 -> Color(0xFF008000) // Dark Green
+            numericBalance < 0.0 -> Color(0xFFD32F2F) // Dark Red
+            else -> Color.Gray
+        }
+    } catch (e: NumberFormatException) {
+        Color.Gray // En caso de que el string no sea un número válido
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -18,35 +47,52 @@ fun AccountsScreen(
     accountsViewModel: AccountsViewModel = hiltViewModel(),
     onAccountClick: (String) -> Unit = {}
 ) {
-    val state by accountsViewModel.accountUiState.collectAsState()
+    val state by accountsViewModel.accountUiState.collectAsState() // Asume que AccountUiState tiene isLoading, accounts, error
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mis Cuentas", style = MaterialTheme.typography.titleLarge) }
+                title = { Text("Mis Cuentas") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                )
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopCenter
         ) {
             when {
-                state?.isLoading == true -> CircularProgressIndicator()
-
-                state?.accounts.isNullOrEmpty() -> Text("No hay cuentas para mostrar.")
-                else -> LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(state!!.accounts, key = { it.id }) { account ->
-                        AccountElegantItem(
-                            account = account,
-                            onClick = { onAccountClick(account.id) }
-                        )
+                state?.isLoading == true -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                state?.error != null -> {
+                    ErrorState(message = "Error: ${state?.error}", modifier = Modifier.align(Alignment.Center))
+                }
+                state?.accounts.isNullOrEmpty() -> {
+                    EmptyState(message = "No hay cuentas para mostrar.", modifier = Modifier.align(Alignment.Center))
+                }
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(state!!.accounts, key = { it.id }) { account ->
+                            // Extraer los parámetros para AccountCardItem
+                            val descriptionText = account.description ?: (account.type + if(account.subType.isNotBlank()) " - ${account.subType}" else "")
+                            AccountCardItem(
+                                nickname = account.nickname,
+                                descriptionText = descriptionText,
+                                balanceAmount = account.balance, // account.balance es String no nulo en el modelo
+                                currency = account.currency,
+                                onClick = { onAccountClick(account.id) }
+                            )
+                        }
                     }
                 }
             }
@@ -55,84 +101,130 @@ fun AccountsScreen(
 }
 
 @Composable
-fun AccountElegantItem(
-    account: Account,
+fun AccountCardItem(
+    // Parámetros primitivos en lugar del objeto Account completo
+    nickname: String?,
+    descriptionText: String,
+    balanceAmount: String, // String no nulo como en el modelo Account
+    currency: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 20.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = account.nickname ?: "Cuenta sin nombre",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        text = account.description ?: "",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Text(
-                    text = "${account.balance} ${account.currency}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = if (account.balance.toDouble() >= 0)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.error
+                Icon(
+                    imageVector = Icons.Filled.AccountBalance,
+                    contentDescription = "Icono de cuenta",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(22.dp)
                 )
             }
-            Spacer(Modifier.height(8.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Tipo: ${account.type}", style = MaterialTheme.typography.bodySmall)
-                Text("Subtipo: ${account.subType}", style = MaterialTheme.typography.bodySmall)
-                Text("Desde: ${account.openingDate}", style = MaterialTheme.typography.bodySmall)
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = nickname ?: "Cuenta sin nombre",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = descriptionText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                 Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = balanceAmount, // Ya es String, el helper maneja la lógica de parseo si es necesario
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = getAccountBalanceColor(balanceAmount)
+                    )
+                    Text(
+                        text = currency,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = getAccountBalanceColor(balanceAmount).copy(alpha = 0.7f)
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Filled.ChevronRight,
+                    contentDescription = "Ver detalle",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(start = 8.dp)
+                )
             }
         }
     }
 }
 
-// Suponiendo que tu modelo Account se ve algo así (en :account:account-domain)
-// package io.rndev.account_domain.model
-// data class Account(
-//     val id: String,
-//     val name: String,
-//     val accountNumber: String,
-//     val balance: String, // O un tipo más apropiado como BigDecimal
-//     val currency: String
-// )
+@Composable
+fun ErrorState(message: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = Icons.Filled.ErrorOutline,
+            contentDescription = "Error",
+            tint = MaterialTheme.colorScheme.error,
+            modifier = Modifier.size(64.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = message,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.error
+        )
+    }
+}
 
-// Suponiendo que tu GetAccountsUseCase se ve algo así (en :account:account-domain)
-// package io.rndev.account_domain.usecase
-// import io.rndev.account_domain.model.Account
-// import io.rndev.account_domain.repository.AccountRepository
-// class GetAccountsUseCase(private val repository: AccountRepository) {
-//     suspend operator fun invoke(): Result<List<Account>> = repository.getAccounts()
-// }
-
-// Y tu AccountException (en :core:common o :account:account-domain)
-// package io.rndev.core.common.exception
-// open class AppException(message: String?, cause: Throwable? = null) : Throwable(message, cause) {
-//     object NetworkError : AppException("Error de red.")
-//     data class ServerError(val code: Int, val originalMessage: String?) : AppException("Error del servidor $code")
-//     data class UnknownError(val detailedMessage: String?, override val cause: Throwable? = null) : AppException(detailedMessage ?: "Error desconocido", cause)
-// }
-// sealed class AccountException(message: String?, cause: Throwable? = null) : AppException(message, cause) {
-//    object NoAccountsFound : AccountException("No se encontraron cuentas", null) // Ejemplo específico
-// }
+@Composable
+fun EmptyState(message: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = message,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}

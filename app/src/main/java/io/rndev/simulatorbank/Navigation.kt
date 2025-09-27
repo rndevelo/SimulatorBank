@@ -62,7 +62,10 @@ fun Navigation() {
                             factory.create(key.accountId)
                         }
                     )
-                    DetailScreen(viewModel = viewModel)
+                    DetailScreen(
+                        viewModel = viewModel,
+                        onNavigateBack = { backStack.removeLastOrNull() }
+                    )
                 }
             },
     )

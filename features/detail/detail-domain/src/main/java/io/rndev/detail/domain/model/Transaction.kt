@@ -2,6 +2,7 @@ package io.rndev.detail.domain.model
 
 // Transaction
 data class Transaction(
+    val transactionId: String,
     val accountId: String,
     val amount: Double,
     val currency: String,
