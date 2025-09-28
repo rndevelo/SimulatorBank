@@ -1,164 +1,223 @@
-package io.rndev.presentation // O el paquete que uses para tu UI
+package io.rndev.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-
-enum class Loading {
-    Show, Hide
-}
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthScreen(
     authViewModel: AuthViewModel = hiltViewModel(),
-    onNavAccount: () -> Unit = {} // Callback para navegar tras login exitoso
+    onLoginSuccessNavigation: () -> Unit = {}, // Callback para navegar tras login exitoso
 ) {
-
     val snackBarHostState = remember { SnackbarHostState() }
-    var isLoading by remember { mutableStateOf(Loading.Hide) }
+    var isLoading by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    // Escucha los eventos del ViewModel para mostrar Snackbars o navegar
+    LaunchedEffect(key1 = Unit) {
         authViewModel.events.collect { event ->
             when (event) {
-                is AuthUiEvent.Idle -> TODO()
-                is AuthUiEvent.Loading -> isLoading = Loading.Show
-                is AuthUiEvent.Success -> {
-                    isLoading = Loading.Hide
-                    snackBarHostState.showSnackbar(
-                        message = event.user.toString(),
-                        duration = SnackbarDuration.Long
-                    )
-                    onNavAccount()
-                }
-
+                is AuthUiEvent.Idle -> false
+                is AuthUiEvent.Loading -> true
+                is AuthUiEvent.Success -> onLoginSuccessNavigation()
                 is AuthUiEvent.Error -> {
-                    isLoading = Loading.Hide
                     snackBarHostState.showSnackbar(
-                        message = event.error,
+                        message = event.error, // El ViewModel ya debería proveer un mensaje amigable
                         duration = SnackbarDuration.Long
                     )
                 }
             }
         }
     }
-
-    AuthContent(
-        snackBarHostState,
-        isLoading,
-        authViewModel::onLoginClicked
-    )
-}
-
-@Composable
-private fun AuthContent(
-    snackBarHostState: SnackbarHostState,
-    isLoading: Loading,
-    onLoginClicked: (String, String) -> Unit,
-) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackBarHostState) }
+        snackbarHost = { SnackbarHost(snackBarHostState) },
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text("Login", style = MaterialTheme.typography.headlineMedium)
-
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-//                    enabled = uiState !is AuthUiEvent.Loading // Deshabilitar si está cargando
-                )
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password") },
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth(),
-//                    enabled = uiState !is AuthUiEvent.Loading // Deshabilitar si está cargando
-                )
-
-                // El botón de login y el indicador de carga se manejan según el estado
-                when (isLoading) {
-
-                    Loading.Show -> {
-                        CircularProgressIndicator(modifier = Modifier.padding(vertical = 8.dp))
-                    }
-
-                    Loading.Hide -> {
-                        Button(
-                            onClick = {
-                                // Podrías añadir validación básica aquí si quieres antes de llamar al VM
-                                if (email.isNotBlank() && password.isNotBlank()) {
-                                    onLoginClicked(email, password)
-                                } else {
-                                    // Considera mostrar un Snackbar o mensaje para campos vacíos
-                                    // scope.launch { snackbarHostState.showSnackbar("Email y contraseña no pueden estar vacíos.") }
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            // enabled se maneja por el estado general de los TextFields y el propio estado de carga
-                        ) {
-                            Text("Login")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun AuthContentPreview() {
-    Surface {
         AuthContent(
-            snackBarHostState = remember { SnackbarHostState() },
-            isLoading = Loading.Hide,
-            onLoginClicked = { _, _ -> }
+            isLoading = isLoading,
+            onLoginClicked = { email, password ->
+                authViewModel.onLoginClicked(email, password)
+            },
+            modifier = Modifier.padding(paddingValues)
         )
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AuthContent(
+    isLoading: Boolean,
+    onLoginClicked: (String, String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp), // Más padding horizontal
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Lock,
+                contentDescription = stringResource(id = R.string.auth_screen_icon_description),
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+
+            Text(
+                text = stringResource(id = R.string.auth_screen_title), // Extráelo a strings.xml
+                style = MaterialTheme.typography.headlineLarge, // Más prominente
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text(stringResource(id = R.string.auth_email_label)) }, // Extráelo a strings.xml
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
+                enabled = !isLoading
+            )
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text(stringResource(id = R.string.auth_password_label)) }, // Extráelo a strings.xml
+                singleLine = true,
+                visualTransformation = if (passwordVisible) VisualTransformation.None
+                else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                        if (email.isNotBlank() && password.isNotBlank()) {
+                            onLoginClicked(email, password)
+                        }
+                    }
+                ),
+                trailingIcon = {
+                    val image = if (passwordVisible)
+                        Icons.Filled.Visibility
+                    else Icons.Filled.VisibilityOff
+                    val description = if (passwordVisible)
+                        stringResource(id = R.string.auth_hide_password_action) // Extráelo
+                    else stringResource(id = R.string.auth_show_password_action) // Extráelo
+
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(imageVector = image, description)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
+            )
+
+            if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.padding(vertical = 12.dp))
+            } else {
+                Button(
+                    onClick = {
+                        keyboardController?.hide() // Ocultar teclado al hacer clic
+                        // Considera añadir validación básica aquí o confiar en el ViewModel/Snackbar para errores
+                        if (email.isNotBlank() && password.isNotBlank()) {
+                            onLoginClicked(email, password)
+                        } else {
+                            // TODO: Podrías querer mostrar un Snackbar específico para campos vacíos aquí
+                            // O dejar que el ViewModel maneje una lógica de validación más compleja si aplica
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp), // Altura estándar para botones
+                    shape = RoundedCornerShape(12.dp), // Bordes redondeados consistentes
+                ) {
+                    Text(stringResource(id = R.string.auth_login_button)) // Extráelo a strings.xml
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, device = "id:pixel_4")
+@Composable
+fun AuthContentPreview() {
+    MaterialTheme {
+        AuthContent(
+            isLoading = false,
+            onLoginClicked = { _, _ -> },
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:pixel_4")
+@Composable
+fun AuthContentLoadingPreview() {
+    MaterialTheme {
+        AuthContent(
+            isLoading = true,
+            onLoginClicked = { _, _ -> },
+        )
+    }
+}
+
+// TODO: Asegúrate de añadir estos strings a tu archivo strings.xml
+

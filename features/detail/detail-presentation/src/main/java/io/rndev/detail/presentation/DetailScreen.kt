@@ -1,33 +1,16 @@
 package io.rndev.detail.presentation
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.TrendingDown
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -44,18 +27,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.rndev.core.common.ErrorState
-import io.rndev.core.common.getBalanceColor
 import io.rndev.detail.domain.model.Account
 import io.rndev.detail.domain.model.Balance
 import io.rndev.detail.domain.model.Transaction
-import kotlin.math.abs
+import io.rndev.detail.presentation.composables.AccountHeader
+import io.rndev.detail.presentation.composables.BalanceCard
+import io.rndev.detail.presentation.composables.TransactionRow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,7 +97,6 @@ fun AccountDetailContent(
     ) {
         item {
             AccountHeader(
-                nickname = account.nickname,
                 accountType = account.type,
                 accountSubType = account.subType,
                 currentBalanceDisplay = account.balance, // balance is already a String
@@ -200,240 +180,6 @@ fun AccountDetailContent(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun AccountHeader(
-    nickname: String?,
-    accountType: String,
-    accountSubType: String,
-    currentBalanceDisplay: String, // Already a String from domain model
-    currency: String,
-    openingDateText: String, // Pre-formatted date string
-    accountDescriptionText: String?,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.Start
-    ) {
-        Text(
-            text = nickname ?: "Nombre de Cuenta no disponible",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = "$accountType - $accountSubType",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        Row(
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column {
-                Text(
-                    text = "Saldo Actual",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Row {
-                    val balanceValue =
-                        currentBalanceDisplay.replace(",", "").toDoubleOrNull() ?: 0.0
-                    Text(
-                        text = currentBalanceDisplay,
-                        style = MaterialTheme.typography.displaySmall.copy(fontSize = 32.sp),
-                        fontWeight = FontWeight.ExtraBold,
-                        color = getBalanceColor(balanceValue)
-                    )
-                    Text(
-                        text = currency,
-                        style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
-                        fontWeight = FontWeight.SemiBold,
-                        color = getBalanceColor(balanceValue),
-                        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
-                    )
-                }
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "Apertura",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = openingDateText,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-        accountDescriptionText?.let {
-            if (it.isNotBlank()) {
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
-    }
-}
-
-@SuppressLint("DefaultLocale")
-@Composable
-fun BalanceCard(
-    balanceType: String,
-    creditDebitIndicatorText: String,
-    amountValue: Double,
-    currencyCode: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Filled.AccountBalanceWallet,
-                contentDescription = "Tipo de Saldo",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(28.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = balanceType,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = creditDebitIndicatorText.replaceFirstChar { it.titlecase() },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = "${
-                    String.format(
-                        "%.2f",
-                        amountValue
-                    )
-                } $currencyCode", // Format Double to String
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = getBalanceColor(amountValue),
-            )
-        }
-    }
-}
-
-@SuppressLint("DefaultLocale")
-@Composable
-fun TransactionRow(
-    descriptionText: String?,
-    bookingDateText: String,
-    amountValue: Double,
-    currencyCode: String,
-    isCredit: Boolean, // Derived from creditDebitIndicator
-    // onClick: () -> Unit = {}, // Add if click action is needed for the row
-    modifier: Modifier = Modifier
-) {
-
-    val amountColor = getBalanceColor(amountValue)
-    val transactionIcon =
-        if (isCredit) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown
-    val sign = when {
-        amountValue == 0.0 -> ""
-        isCredit -> "+"
-        else -> "-"
-    }
-    val formattedAmount =
-        sign + String.format("%.2f", abs(amountValue)) // Show absolute amount with sign
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { /* onClick() */ } // Call onClick if defined and needed
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(amountColor.copy(alpha = 0.1f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = transactionIcon,
-                contentDescription = if (isCredit) "Ingreso" else "Egreso",
-                tint = amountColor,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = descriptionText ?: "Sin descripción",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Filled.CalendarToday,
-                    contentDescription = "Fecha",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(12.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = bookingDateText,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-        Spacer(modifier = Modifier.width(12.dp))
-        Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = formattedAmount,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                color = amountColor
-            )
-            Text(
-                text = currencyCode,
-                style = MaterialTheme.typography.labelSmall,
-                color = amountColor.copy(alpha = 0.7f)
-            )
-        }
-        Icon(
-            imageVector = Icons.Filled.ChevronRight,
-            contentDescription = "Ver detalle",
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-            modifier = Modifier.padding(start = 8.dp)
-        )
     }
 }
 

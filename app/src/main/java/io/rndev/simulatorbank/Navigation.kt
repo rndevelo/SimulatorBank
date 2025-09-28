@@ -9,9 +9,6 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
 import io.rndev.detail.presentation.DetailScreen
 import io.rndev.detail.presentation.DetailViewModel
 import io.rndev.presentation.AccountsScreen
@@ -43,7 +40,7 @@ fun Navigation() {
             entryProvider {
                 entry<Auth> {
                     AuthScreen(
-                        onNavAccount = {
+                        onLoginSuccessNavigation = {
                             backStack.clear()
                             backStack.add(Accounts)
                         },

@@ -1,0 +1,10 @@
+<resources>
+    <string name="auth_screen_icon_description">Icono de pantalla de autenticación</string>
+    <string name="auth_screen_title">Iniciar Sesión</string>
+    <string name="auth_email_label">Correo electrónico</string>
+    <string name="auth_password_label">Contraseña</string>
+    <string name="auth_login_button">Acceder</string>
+    <string name="auth_hide_password_action">Ocultar contraseña</string>
+    <string name="auth_show_password_action">Mostrar contraseña</string>
+    <string name="auth_success_message">¡Bienvenido, %1$s!</string>
+</resources>

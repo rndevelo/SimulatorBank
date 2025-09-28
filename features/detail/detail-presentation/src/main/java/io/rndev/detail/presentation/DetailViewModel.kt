@@ -56,7 +56,15 @@ class DetailViewModel @AssistedInject constructor(
     }
 
     private fun loadAccountDetailProgressiveInternal() = viewModelScope.launch {
-        _uiState.update { it.copy(isLoading = true, error = null, account = null, balances = emptyList(), transactions = emptyList()) }
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                error = null,
+                account = null,
+                balances = emptyList(),
+                transactions = emptyList()
+            )
+        }
 
         // 1. Cargar datos de la cuenta
         val accountResult = getAccountUseCase(accountId)
@@ -65,24 +73,42 @@ class DetailViewModel @AssistedInject constructor(
                 _uiState.update { it.copy(account = accountData) } // Aún podría estar cargando el resto
 
                 // 2. Si la cuenta se cargó, cargar saldos y transacciones en paralelo
-                coroutineScope { // Asegura que ambas tareas finalicen o se cancelen juntas
+                launch { // Asegura que ambas tareas finalicen o se cancelen juntas
                     val balancesResultDeferred = async { getBalancesUseCase(accountId) }
                     val transactionsResultDeferred = async { getTransactionsUseCase(accountId) }
 
                     val balancesResult = balancesResultDeferred.await()
                     val transactionsResult = transactionsResultDeferred.await()
 
-                    var tempError: String? = null
-
                     balancesResult
-                        .onSuccess { balancesData -> _uiState.update { it.copy(balances = balancesData) } }
-                        .onFailure { throwable -> tempError = tempError ?: getErrorMessage(throwable) }
+                        .onSuccess { balancesData ->
+                            _uiState.update {
+                                it.copy(isLoading = false, balances = balancesData)
+                            }
+                        }
+                        .onFailure { throwable ->
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = getErrorMessage(throwable)
+                                )
+                            }
+                        }
 
                     transactionsResult
-                        .onSuccess { transactionsData -> _uiState.update { it.copy(transactions = transactionsData) } }
-                        .onFailure { throwable -> tempError = tempError ?: getErrorMessage(throwable) }
-
-                    _uiState.update { it.copy(isLoading = false, error = tempError) }
+                        .onSuccess { transactionsData ->
+                            _uiState.update {
+                                it.copy(isLoading = false,transactions = transactionsData)
+                            }
+                        }
+                        .onFailure { throwable ->
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = getErrorMessage(throwable)
+                                )
+                            }
+                        }
                 }
             }
             .onFailure { throwable ->
