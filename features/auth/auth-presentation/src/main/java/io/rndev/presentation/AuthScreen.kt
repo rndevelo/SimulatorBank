@@ -3,7 +3,6 @@ package io.rndev.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,13 +38,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.password
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,22 +118,34 @@ private fun AuthContent(
             Icon(
                 imageVector = Icons.Filled.Lock,
                 contentDescription = stringResource(id = R.string.auth_screen_icon_description),
-                modifier = Modifier.size(64.dp),
+                modifier = Modifier
+                    .size(64.dp)
+                    .semantics {
+                        role = Role.Image
+                    },
                 tint = MaterialTheme.colorScheme.primary
             )
 
             Text(
                 text = stringResource(id = R.string.auth_screen_title), // Extráelo a strings.xml
                 style = MaterialTheme.typography.headlineLarge, // Más prominente
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.semantics { heading() }
             )
+
+
+            val authEmailLabelText = stringResource(id = R.string.auth_email_label)
 
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text(stringResource(id = R.string.auth_email_label)) }, // Extráelo a strings.xml
+                label = { Text(authEmailLabelText) }, // Extráelo a strings.xml
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics {
+                        contentDescription = authEmailLabelText
+                    },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
@@ -136,10 +153,12 @@ private fun AuthContent(
                 enabled = !isLoading
             )
 
+            val authPasswordLabelText = stringResource(id = R.string.auth_password_label)
+
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text(stringResource(id = R.string.auth_password_label)) }, // Extráelo a strings.xml
+                label = { Text(authPasswordLabelText) }, // Extráelo a strings.xml
                 singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None
                 else PasswordVisualTransformation(),
@@ -167,13 +186,26 @@ private fun AuthContent(
                         Icon(imageVector = image, description)
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics {
+                        password()
+                        contentDescription = authPasswordLabelText
+                    },
                 enabled = !isLoading
             )
 
             if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.padding(vertical = 12.dp))
+                val authLoadingDescription = stringResource(id = R.string.auth_loading_description)
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(vertical = 12.dp)
+                        .semantics {
+                            contentDescription = authLoadingDescription
+                        }
+                )
             } else {
+                val authLoginButton = stringResource(id = R.string.auth_login_button)
                 Button(
                     onClick = {
                         keyboardController?.hide() // Ocultar teclado al hacer clic
@@ -181,16 +213,19 @@ private fun AuthContent(
                         if (email.isNotBlank() && password.isNotBlank()) {
                             onLoginClicked(email, password)
                         } else {
-                            // TODO: Podrías querer mostrar un Snackbar específico para campos vacíos aquí
                             // O dejar que el ViewModel maneje una lógica de validación más compleja si aplica
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp), // Altura estándar para botones
+                        .height(48.dp)
+                        .semantics {
+                            contentDescription = authLoginButton
+                            role = Role.Button
+                        }, // Altura estándar para botones
                     shape = RoundedCornerShape(12.dp), // Bordes redondeados consistentes
                 ) {
-                    Text(stringResource(id = R.string.auth_login_button)) // Extráelo a strings.xml
+                    Text(authLoginButton) // Extráelo a strings.xml
                 }
             }
         }
@@ -218,6 +253,3 @@ fun AuthContentLoadingPreview() {
         )
     }
 }
-
-// TODO: Asegúrate de añadir estos strings a tu archivo strings.xml
-

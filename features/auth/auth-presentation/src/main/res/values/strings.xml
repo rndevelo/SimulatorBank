@@ -7,4 +7,5 @@
     <string name="auth_hide_password_action">Ocultar contraseña</string>
     <string name="auth_show_password_action">Mostrar contraseña</string>
     <string name="auth_success_message">¡Bienvenido, %1$s!</string>
+    <string name="auth_loading_description">Loading progress indicator</string>
 </resources>
