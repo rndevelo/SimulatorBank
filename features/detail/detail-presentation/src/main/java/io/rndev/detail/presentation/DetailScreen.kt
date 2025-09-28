@@ -27,6 +27,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,18 +44,36 @@ import io.rndev.detail.presentation.composables.TransactionRow
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
-    viewModel: DetailViewModel, // Assuming DetailViewModel provides the state
-    onNavigateBack: () -> Unit // Callback for back navigation
+    viewModel: DetailViewModel,
+    onNavigateBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
+
+    // Extraer strings fuera de lambdas de semantics
+    val backButtonDescription = stringResource(id = R.string.detail_back_button_description)
+    val loadingDescription = stringResource(id = R.string.detail_loading_description)
+    val noDataDescription = stringResource(id = R.string.detail_no_data_description)
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(state.account?.nickname ?: "Detalle de Cuenta") },
+                title = {
+                    Text(
+                        state.account?.nickname
+                            ?: stringResource(id = R.string.detail_default_title)
+                    )
+                },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.semantics {
+                            contentDescription = backButtonDescription
+                        }
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null // ya lo gestiona semantics
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -69,17 +90,28 @@ fun DetailScreen(
             contentAlignment = Alignment.Center
         ) {
             when {
-                state.isLoading -> CircularProgressIndicator()
-                state.error != null -> ErrorState(message = "Error: ${state.error}")
+                state.isLoading -> CircularProgressIndicator(
+                    modifier = Modifier.semantics {
+                        contentDescription = loadingDescription
+                    }
+                )
+
+                state.error != null -> ErrorState(
+                    message = stringResource(
+                        id = R.string.detail_error_message,
+                        state.error ?: ""
+                    )
+                )
+
                 state.account != null -> {
                     AccountDetailContent(
-                        account = state.account!!, // Pass the full account object here
-                        balances = state.balances,   // Pass the full balance list
-                        transactions = state.transactions // Pass the full transaction list
+                        account = state.account!!,
+                        balances = state.balances,
+                        transactions = state.transactions
                     )
                 }
 
-                else -> ErrorState(message = "No se encontraron datos de la cuenta.")
+                else -> ErrorState(message = noDataDescription)
             }
         }
     }
@@ -189,26 +221,10 @@ fun SectionTitle(title: String, modifier: Modifier = Modifier) {
         text = title,
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.SemiBold,
-        color = MaterialTheme.colorScheme.onSurface, // More prominent than onSurfaceVariant
-        modifier = modifier
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier.semantics {
+            contentDescription = title // título leído por screen reader
+        }
     )
 }
 
-
-//@Preview(showBackground = true)
-//@Composable
-//fun AccountDetailContentPreview() {
-//    AccountDetailContent(
-//        account = Account(),
-//        balances = listOf(Balance(currency = "USD", amount = 1000.0)),
-//        transactions = listOf(
-//            Transaction(
-//                transactionId = "1",
-//                date = "2023-10-01",
-//                description = "Purchase",
-//                amount = -50.0
-//            ),
-//            Transaction(transactionId = "2", date = "2023")
-//        )
-//    )
-//}

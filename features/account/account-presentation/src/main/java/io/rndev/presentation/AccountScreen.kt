@@ -1,19 +1,7 @@
 package io.rndev.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -22,16 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -40,6 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,19 +32,27 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import io.rndev.core.common.getBalanceColor
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountsScreen(
     accountsViewModel: AccountsViewModel = hiltViewModel(),
     onAccountClick: (String) -> Unit = {}
 ) {
-    val state by accountsViewModel.accountUiState.collectAsState() // Asume que AccountUiState tiene isLoading, accounts, error
+    val state by accountsViewModel.accountUiState.collectAsState()
+
+    val screenDescription = stringResource(R.string.account_screen_overall_description)
+    val loadingDescription = stringResource(R.string.accounts_loading_description)
+    val loadingStateDescription = stringResource(R.string.loading_in_progress)
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(id = R.string.account_screen_title)) },
+                title = {
+                    Text(
+                        stringResource(id = R.string.account_screen_title),
+                        modifier = Modifier.semantics { heading() }
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
                 )
@@ -67,15 +60,24 @@ fun AccountsScreen(
         },
         containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
     ) { paddingValues ->
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(paddingValues)
+                .semantics { contentDescription = screenDescription },
             contentAlignment = Alignment.TopCenter
         ) {
             when {
                 state.isLoading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .semantics {
+                                contentDescription = loadingDescription
+                                stateDescription = loadingStateDescription
+                            }
+                    )
                 }
 
                 state.error != null -> {
@@ -101,6 +103,7 @@ fun AccountsScreen(
                         items(state.accounts, key = { it.id }) { account ->
                             val descriptionText = account.description
                                 ?: (account.type + if (account.subType.isNotBlank()) " - ${account.subType}" else "")
+
                             AccountCardItem(
                                 nickname = account.nickname,
                                 descriptionText = descriptionText,
@@ -125,9 +128,22 @@ fun AccountCardItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val contentDesc = buildString {
+        append(nickname ?: stringResource(id = R.string.account_card_default_nickname))
+        append(". ")
+        append(descriptionText)
+        append(". ")
+        append(stringResource(id = R.string.account_balance_accessibility, balanceAmount, currency))
+    }
+
     Card(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics {
+                contentDescription = contentDesc
+                role = Role.Button
+            },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
@@ -198,12 +214,12 @@ private fun AccountDataContent(balanceAmount: String, currency: String) {
                 text = balanceAmount,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = getBalanceColor(balanceAmount.toDoubleOrNull() ?: 0.0) // Safely parse to Double
+                color = getBalanceColor(balanceAmount.toDoubleOrNull() ?: 0.0)
             )
             Text(
                 text = currency,
                 style = MaterialTheme.typography.labelSmall,
-                color = getBalanceColor(balanceAmount.toDoubleOrNull() ?: 0.0).copy(alpha = 0.7f) // Safely parse to Double
+                color = getBalanceColor(balanceAmount.toDoubleOrNull() ?: 0.0).copy(alpha = 0.7f)
             )
         }
         Icon(
@@ -220,12 +236,13 @@ fun EmptyState(message: String, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .semantics { contentDescription = message },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = message, // This message comes from AccountsScreen, already using stringResource
+            text = message,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -233,27 +250,25 @@ fun EmptyState(message: String, modifier: Modifier = Modifier) {
     }
 }
 
-// Assuming ErrorState is defined in a common module or here.
-// If it's local and uses hardcoded strings for its icon's content description, that should also be extracted.
-// For this example, I'll define a local ErrorState that uses the string resource.
 @Composable
 fun ErrorState(message: String, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .semantics { contentDescription = message },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
             imageVector = Icons.Filled.ErrorOutline,
-            contentDescription = stringResource(id = R.string.generic_error_icon_description), // Extracted
+            contentDescription = stringResource(id = R.string.generic_error_icon_description),
             tint = MaterialTheme.colorScheme.error,
             modifier = Modifier.size(64.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = message, // This message comes from AccountsScreen, already using stringResource
+            text = message,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.error

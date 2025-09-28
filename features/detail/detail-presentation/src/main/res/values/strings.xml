@@ -1,0 +1,15 @@
+<resources>
+    <!-- DetailScreen -->
+    <string name="detail_default_title">Account Detail</string>
+    <string name="detail_back_button_description">Back to accounts</string>
+    <string name="detail_loading_description">Loading account details</string>
+    <string name="detail_no_data_description">No account data found</string>
+    <string name="detail_error_message">Error: %1$s</string>
+
+    <!-- AccountHeader -->
+    <string name="detail_balance_label">Current Balance</string>
+    <string name="detail_opening_date_label">Opening</string>
+    <string name="detail_section_balances">Account Balances</string>
+    <string name="detail_section_transactions">Recent Transactions</string>
+    <string name="detail_no_transactions">No recent transactions</string>
+</resources>

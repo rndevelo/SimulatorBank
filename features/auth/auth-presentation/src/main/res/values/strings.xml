@@ -1,11 +1,12 @@
 <resources>
-    <string name="auth_screen_icon_description">Icono de pantalla de autenticación</string>
-    <string name="auth_screen_title">Iniciar Sesión</string>
-    <string name="auth_email_label">Correo electrónico</string>
-    <string name="auth_password_label">Contraseña</string>
-    <string name="auth_login_button">Acceder</string>
-    <string name="auth_hide_password_action">Ocultar contraseña</string>
-    <string name="auth_show_password_action">Mostrar contraseña</string>
-    <string name="auth_success_message">¡Bienvenido, %1$s!</string>
+    <string name="auth_screen_icon_description">Authentication screen icon</string>
+    <string name="auth_screen_title">Sign In</string>
+    <string name="auth_email_label">Email</string>
+    <string name="auth_password_label">Password</string>
+    <string name="auth_login_button">Log In</string>
+    <string name="auth_hide_password_action">Hide password</string>
+    <string name="auth_show_password_action">Show password</string>
+    <string name="auth_success_message">Welcome, %1$s!</string>
     <string name="auth_loading_description">Loading progress indicator</string>
 </resources>
+

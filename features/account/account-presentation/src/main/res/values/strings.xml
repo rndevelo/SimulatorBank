@@ -1,9 +1,22 @@
 <resources>
-    <string name="account_screen_title">Mis Cuentas</string>
+    <!-- Screens -->
+    <string name="account_screen_title">Accounts</string>
+    <string name="account_screen_overall_description">Accounts screen with list and status</string>
+
+    <!-- Loading -->
+    <string name="accounts_loading_description">Loading accounts</string>
+    <string name="loading_in_progress">In progress</string>
+
+    <!-- Errors -->
     <string name="generic_error_prefix">Error: </string>
-    <string name="accounts_empty_list">No hay cuentas para mostrar.</string>
-    <string name="account_card_icon_description">Icono de cuenta</string>
-    <string name="account_card_default_nickname">Cuenta sin nombre</string>
-    <string name="account_card_view_detail_action">Ver detalle</string>
-    <string name="generic_error_icon_description">Error</string>
+    <string name="generic_error_icon_description">Error icon</string>
+
+    <!-- Empty State -->
+    <string name="accounts_empty_list">No accounts available</string>
+
+    <!-- Account Card -->
+    <string name="account_card_default_nickname">Unnamed account</string>
+    <string name="account_card_icon_description">Account icon</string>
+    <string name="account_card_view_detail_action">View account details</string>
+    <string name="account_balance_accessibility">Balance: %1$s %2$s</string>
 </resources>
