@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">SimulatorBank</string>
+    <string name="account_screen_title">Mis Cuentas</string>
+    <string name="generic_error_prefix">Error: </string>
+    <string name="accounts_empty_list">No hay cuentas para mostrar.</string>
+    <string name="account_card_icon_description">Icono de cuenta</string>
+    <string name="account_card_default_nickname">Cuenta sin nombre</string>
+    <string name="account_card_view_detail_action">Ver detalle</string>
+    <string name="generic_error_icon_description">Error</string>
 </resources>
