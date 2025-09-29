@@ -9,9 +9,6 @@ sealed class AccountsException(message: String? = null, cause: Throwable? = null
     object InvalidCredentials : Exception("Las credenciales proporcionadas son incorrectas.")
     object UserNotFound : Exception("El usuario no existe.")
     object ReadAccountsError : Exception("Error al procesar la lista de cuentas.")
-    object WeakPassword : Exception("La contraseña es demasiado débil.")
-    object TokenExpired : Exception("La sesión ha expirado. Por favor, inicia sesión de nuevo.")
-    object OperationNotPermitted : Exception("Operación no permitida.")
 
     // Error Genérico
     data class UnknownError(val detailedMessage: String?, override val cause: Throwable? = null) : Exception("Ha ocurrido un error inesperado.")

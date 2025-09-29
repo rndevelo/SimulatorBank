@@ -34,9 +34,7 @@ class AuthViewModel @Inject constructor(private val authUseCase: AuthUseCase) : 
                     _eventChannel.send(AuthUiEvent.Success(user))
                 }
                 .onFailure { throwable ->
-                    val authError = throwable as? AuthException
-                        ?: AuthException.UnknownError("Error inesperado en ViewModel", throwable)
-                    _eventChannel.send(AuthUiEvent.Error(authError.message ?: "Error desconocido"))
+                    _eventChannel.send(AuthUiEvent.Error(throwable.message ?: "Error desconocido"))
                 }
         }
     }

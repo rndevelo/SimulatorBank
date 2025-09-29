@@ -158,7 +158,7 @@ class AuthRepositoryImplTest {
         verify(mockTokenProvider, never()).saveToken(any())
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
-        assertTrue(exception is AuthException.ReadServerResponseError)
+        assertTrue(exception is AuthException.NetworkError)
         assertEquals("Error al procesar la respuesta del servidor.", (exception as AuthException.ReadServerResponseError).message)
         assertEquals(causeThrowable, exception.cause)
     }

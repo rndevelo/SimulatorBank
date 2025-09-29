@@ -30,7 +30,7 @@ class DetailRepositoryImpl @Inject constructor(
                 balance = dto.balance
             )
         }.recoverCatching { throwable ->
-            handleThrowable(throwable, "Error al procesar los datos de la cuenta.")
+            handleThrowable(throwable, DetailException.AccountDataError)
         }
     }
 
@@ -51,7 +51,7 @@ class DetailRepositoryImpl @Inject constructor(
                 )
             }
         }.recoverCatching { throwable ->
-            handleThrowable(throwable, "Error al procesar la lista de transacciones.")
+            handleThrowable(throwable, DetailException.TransactionsDataError)
         }
     }
 
@@ -69,7 +69,7 @@ class DetailRepositoryImpl @Inject constructor(
                 )
             }
         }.recoverCatching { throwable ->
-            handleThrowable(throwable, "Error al procesar la lista de saldos.")
+            handleThrowable(throwable, DetailException.BalancesDataError)
         }
     }
 
@@ -82,16 +82,16 @@ class DetailRepositoryImpl @Inject constructor(
                 name = dto.name
             )
         }.recoverCatching { throwable ->
-            handleThrowable(throwable, "Error al procesar los datos del titular.")
+            handleThrowable(throwable, DetailException.PartyDataError)
         }
     }
 
     // Función de ayuda para manejar throwables de forma consistente
-    private fun handleThrowable(throwable: Throwable, defaultMessage: String): Nothing {
+    private fun handleThrowable(throwable: Throwable, exception: Exception): Nothing {
         if (throwable is Exception) {
             throw throwable // Propaga excepciones conocidas (incluyendo NetworkException del dataSource)
         } else {
-            throw DetailException.ReadUserDataError
+            throw exception
         }
     }
 }

@@ -1,5 +1,6 @@
 package io.rndev.data
 
+import android.util.Log
 import io.rndev.core.common.TokenProvider
 import io.rndev.domain.AuthRepository
 import io.rndev.domain.User
@@ -21,13 +22,11 @@ class AuthRepositoryImpl @Inject constructor(
             // Aquí conviertes tu UserTokenDto a tu UserModel del dominio
             authDto.user?.toDomainModel()!! // Usando una función de extensión como ejemplo
         }.recoverCatching { throwable ->
+            Log.d("AuthRepositoryImpl", "throwable: $throwable")
             // Si el mapeo a DomainModel falla (aunque es raro si el DTO es correcto),
             // o si quieres convertir cualquier Throwable no-AuthException a uno.
             if (throwable is Exception) throw throwable
-            else throw AuthException.UnknownError(
-                "Error al procesar la respuesta del servidor.",
-                throwable
-            )
+            else throw AuthException.ReadServerResponseError
         }
     }
 }
