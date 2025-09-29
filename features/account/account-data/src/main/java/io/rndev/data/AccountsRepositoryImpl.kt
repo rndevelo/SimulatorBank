@@ -38,10 +38,7 @@ class AccountsRepositoryImpl @Inject constructor(
                 throw throwable
             } else {
                 // Wrap non-Exception throwables with a domain-specific error
-                throw AccountsException.UnknownError(
-                    "Error al procesar la lista de cuentas.",
-                    throwable
-                )
+                throw AccountsException.ReadAccountsError
             }
         }
     }

@@ -19,7 +19,7 @@ class AuthRepositoryImpl @Inject constructor(
             tokenProvider.saveToken(authDto.accessToken)
             // .mapCatching para seguridad adicional, aunque el Result ya maneja excepciones
             // Aquí conviertes tu UserTokenDto a tu UserModel del dominio
-            authDto.toDomainModel() // Usando una función de extensión como ejemplo
+            authDto.user?.toDomainModel()!! // Usando una función de extensión como ejemplo
         }.recoverCatching { throwable ->
             // Si el mapeo a DomainModel falla (aunque es raro si el DTO es correcto),
             // o si quieres convertir cualquier Throwable no-AuthException a uno.
@@ -32,8 +32,8 @@ class AuthRepositoryImpl @Inject constructor(
     }
 }
 
-private fun AuthDto.toDomainModel() = User(
-    id = user.id,
-    username = user.username,
-    name = user.name
+private fun UserDto.toDomainModel() = User(
+    id = id,
+    username = username,
+    name = name
 )

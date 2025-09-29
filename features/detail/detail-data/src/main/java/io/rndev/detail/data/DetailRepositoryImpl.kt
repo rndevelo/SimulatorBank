@@ -91,7 +91,7 @@ class DetailRepositoryImpl @Inject constructor(
         if (throwable is Exception) {
             throw throwable // Propaga excepciones conocidas (incluyendo NetworkException del dataSource)
         } else {
-            throw DetailException.UnknownError(defaultMessage, throwable)
+            throw DetailException.ReadUserDataError
         }
     }
 }

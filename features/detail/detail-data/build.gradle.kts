@@ -13,4 +13,5 @@ jacoco {
 
 dependencies {
     implementation(project(":features:detail:detail-domain"))
+    implementation(libs.kotlinx.coroutines.test)
 }

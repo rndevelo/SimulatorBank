@@ -13,4 +13,5 @@ jacoco {
 
 dependencies {
     implementation(project(":features:account:account-domain"))
+    implementation(libs.kotlinx.coroutines.test)
 }

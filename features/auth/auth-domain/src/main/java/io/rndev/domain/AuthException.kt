@@ -8,10 +8,7 @@ sealed class AuthException(message: String? = null, cause: Throwable? = null) : 
     // Errores Específicos de Autenticación
     object InvalidCredentials : Exception("Las credenciales proporcionadas son incorrectas.")
     object UserNotFound : Exception("El usuario no existe.")
-    object UserAlreadyExists : Exception("Un usuario con estas credenciales ya existe.")
-    object WeakPassword : Exception("La contraseña es demasiado débil.")
-    object TokenExpired : Exception("La sesión ha expirado. Por favor, inicia sesión de nuevo.")
-    object OperationNotPermitted : Exception("Operación no permitida.")
+    object ReadServerResponseError : Exception("Error al procesar la respuesta del servidor.")
 
     // Error Genérico
     data class UnknownError(val detailedMessage: String?, override val cause: Throwable? = null) : Exception("Ha ocurrido un error inesperado.")

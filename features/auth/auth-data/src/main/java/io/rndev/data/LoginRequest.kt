@@ -18,7 +18,7 @@ data class AuthDto(
     @SerialName("refresh_token")
     val refreshToken: String,
     @SerialName("user")
-    val user: UserDto
+    val user: UserDto?
 )
 
 @Serializable

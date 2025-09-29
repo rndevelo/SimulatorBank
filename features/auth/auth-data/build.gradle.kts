@@ -30,4 +30,5 @@ android {
 dependencies {
     implementation(project(":features:auth:auth-domain"))
     implementation(project(":core:common"))
+    implementation(libs.kotlinx.coroutines.test)
 }
