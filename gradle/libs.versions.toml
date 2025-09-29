@@ -58,9 +58,13 @@ coroutines = "1.10.2"
 
 # Build logic
 rndevBuildlogic = "1.0.8"
+
+
 appcompatVersion = "1.7.1"
 materialVersion = "1.13.0"
 cronetApi = "141.7340.3"
+
+jacoco = "0.8.11"
 
 [libraries]
 # AndroidX
@@ -115,6 +119,7 @@ mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", versio
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 androidx-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "test" }
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "test" }
+#jacoco = { id = "jacoco", version.ref = "jacoco" }
 
 # Gradle Plugins
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
