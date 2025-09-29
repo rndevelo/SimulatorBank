@@ -13,7 +13,7 @@ data class AccountsResponseDto(
 @Serializable
 data class AccountsDataDto(
     @SerialName("Account")
-    val account: List<AccountDto>
+    val accounts: List<AccountDto>
 )
 
 @Serializable
@@ -33,26 +33,5 @@ data class AccountDto(
     @SerialName("OpeningDate")
     val openingDate: String,
     @SerialName("Balance")
-    val balance: Double
-)
-
-
-@Serializable
-data class AccountInfoDto(
-    @SerialName("Identification")
-    val identification: String,
-    @SerialName("Name")
-    val name: String,
-    @SerialName("SchemeName")
-    val schemeName: String,
-    @SerialName("SecondaryIdentification")
-    val secondaryIdentification: String
-)
-
-@Serializable
-data class ServicerDto(
-    @SerialName("Identification")
-    val identification: String,
-    @SerialName("SchemeName")
-    val schemeName: String
+    val balance: String
 )

@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.rndev.domain.AccountRepository
+import io.rndev.domain.AccountsRepository
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -20,8 +20,8 @@ internal abstract class BindsAccountDataModule {
 
     @Binds
     abstract fun bindAuthRepository(
-        repository: AccountRepositoryImpl
-    ): AccountRepository
+        repository: AccountsRepositoryImpl
+    ): AccountsRepository
 }
 
 @Module
@@ -29,7 +29,7 @@ internal abstract class BindsAccountDataModule {
 object ProvideAccountRetrofitModule {
     @Provides
     @Singleton
-    fun provideAuthApi(retrofit: Retrofit): AccountApiService {
-        return retrofit.create(AccountApiService::class.java)
+    fun provideAuthApi(retrofit: Retrofit): AccountsApiService {
+        return retrofit.create(AccountsApiService::class.java)
     }
 }

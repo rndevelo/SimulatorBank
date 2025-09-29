@@ -5,6 +5,12 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint.gradle)
     alias(libs.plugins.kotlinxSerialization)
+    id("jacoco") // Aplicar el plugin de JaCoCo directamente
+}
+
+// Configuración de la versión de JaCoCo
+jacoco {
+    toolVersion = "0.8.12"
 }
 
 android {
@@ -18,14 +24,32 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Habilitar la cobertura de código para el build type 'debug'
+            enableUnitTestCoverage = true // Para tests unitarios (src/test)
+            enableAndroidTestCoverage = true // Para tests instrumentados (src/androidTest)
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            // Es buena práctica no habilitar la cobertura en release builds
+            // enableUnitTestCoverage = false
+            // enableAndroidTestCoverage = false
         }
     }
+    // Especificar los tipos de test que JaCoCo debe considerar para la cobertura.
+    // Esto es especialmente útil si tienes variantes de build complejas.
+    // Para una configuración estándar, esto podría no ser estrictamente necesario
+    // si `enableUnitTestCoverage` y `enableAndroidTestCoverage` funcionan como se espera.
+    // No obstante, configurarlo explícitamente puede dar más control.
+    /*
+    testCoverage {
+        jacocoVersion.set("0.8.12") // Redundante si ya está en jacoco { toolVersion = ... } pero no hace daño
+    }
+    */
 }
 
 dependencies {
@@ -35,6 +59,9 @@ dependencies {
     implementation(project(":features:account:account-presentation"))
     implementation(project(":features:account:account-domain"))
     implementation(project(":features:account:account-data"))
+    implementation(project(":features:detail:detail-presentation"))
+    implementation(project(":features:detail:detail-domain"))
+    implementation(project(":features:detail:detail-data"))
     implementation(project(":core:common"))
     implementation(project(":core:network"))
 

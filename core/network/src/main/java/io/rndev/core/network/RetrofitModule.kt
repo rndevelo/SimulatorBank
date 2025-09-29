@@ -20,7 +20,7 @@ object RetrofitModule {
 
     // Base URL apuntando al Mockoon sandbox
     private const val BASE_URL =
-        "http://10.0.2.2:3000/sandbox/uk.openbanking.accountinfo/oauth2/v3.1.5/"
+        "http://10.23.16.14:3000/sandbox/uk.openbanking.accountinfo/oauth2/v3.1.5/"
 
     // Kotlinx JSON
     @Provides

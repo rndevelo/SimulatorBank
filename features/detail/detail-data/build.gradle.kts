@@ -1,13 +1,16 @@
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-kotlin {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
-    }
-}
 plugins {
-    id("java-library")
-    alias(libs.plugins.jetbrains.kotlin.jvm)
+    alias(libs.plugins.rndev.jvm.library)
+    alias(libs.plugins.rndev.jvm.retrofit)
+    alias(libs.plugins.rndev.di.library)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.ktlint.gradle)
+    id("jacoco") // Aplicar el plugin de JaCoCo directamente
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+dependencies {
+    implementation(project(":features:detail:detail-domain"))
 }

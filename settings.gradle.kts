@@ -38,14 +38,14 @@ dependencyResolutionManagement {
 
 rootProject.name = "SimulatorBank"
 include(":app")
+include(":core:network")
+include(":core:common")
 include(":features:auth:auth-domain")
 include(":features:auth:auth-data")
 include(":features:auth:auth-presentation")
 include(":features:account:account-domain")
 include(":features:account:account-data")
 include(":features:account:account-presentation")
-include(":core:network")
-include(":core:common")
 include(":features:detail:detail-domain")
 include(":features:detail:detail-presentation")
 include(":features:detail:detail-data")
