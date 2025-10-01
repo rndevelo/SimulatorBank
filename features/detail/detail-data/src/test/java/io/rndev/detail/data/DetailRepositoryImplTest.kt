@@ -39,13 +39,26 @@ class DetailRepositoryImplTest {
     fun `getAccount success - maps DTO to domain Account`() = runTest {
         // Given
         val detailAccountDto = DetailAccountDto(
-            accountId = accountId, accountType = "CURRENT", accountSubType = "C1", currency = "EUR",
-            description = "Test Account Desc", nickname = "Test Nickname", openingDate = "2023-01-01", balance = "123.45"
+            accountId = accountId,
+            accountType = "CURRENT",
+            accountSubType = "C1",
+            currency = "EUR",
+            description = "Test Account Desc",
+            nickname = "Test Nickname",
+            openingDate = "2023-01-01",
+            balance = "123.45"
         )
-        val accountResponseDto = AccountResponseDto(data = AccountDataDto(account = detailAccountDto))
+        val accountResponseDto =
+            AccountResponseDto(data = AccountDataDto(account = detailAccountDto))
         val expectedAccount = Account(
-            id = accountId, type = "CURRENT", subType = "C1", currency = "EUR",
-            description = "Test Account Desc", nickname = "Test Nickname", openingDate = "2023-01-01", balance = "123.45"
+            id = accountId,
+            type = "CURRENT",
+            subType = "C1",
+            currency = "EUR",
+            description = "Test Account Desc",
+            nickname = "Test Nickname",
+            openingDate = "2023-01-01",
+            balance = "123.45"
         )
 
         whenever(mockDataSource.getAccount(accountId)).thenReturn(Result.success(accountResponseDto))
@@ -60,32 +73,42 @@ class DetailRepositoryImplTest {
     }
 
     @Test
-    fun `getAccount failure - dataSource returns specific Exception - propagates Exception`() = runTest {
-        // Given
-        val expectedException = DetailException.NetworkError(RuntimeException("Network issue"))
-        whenever(mockDataSource.getAccount(accountId)).thenReturn(Result.failure(expectedException))
+    fun `getAccount failure - dataSource returns specific Exception - propagates Exception`() =
+        runTest {
+            // Given
+            val expectedException = DetailException.NetworkError(RuntimeException("Network issue"))
+            whenever(mockDataSource.getAccount(accountId)).thenReturn(
+                Result.failure(
+                    expectedException
+                )
+            )
 
-        // When
-        val result = repository.getAccount(accountId)
+            // When
+            val result = repository.getAccount(accountId)
 
-        // Then
-        assertTrue(result.isFailure)
-        assertEquals(expectedException, result.exceptionOrNull())
-    }
+            // Then
+            assertTrue(result.isFailure)
+            assertEquals(expectedException, result.exceptionOrNull())
+        }
 
     @Test
-    fun `getAccount failure - dataSource returns generic Exception - propagates Exception`() = runTest {
-        // Given
-        val genericException = RuntimeException("Some generic error")
-        whenever(mockDataSource.getAccount(accountId)).thenReturn(Result.failure(genericException))
+    fun `getAccount failure - dataSource returns generic Exception - propagates Exception`() =
+        runTest {
+            // Given
+            val genericException = RuntimeException("Some generic error")
+            whenever(mockDataSource.getAccount(accountId)).thenReturn(
+                Result.failure(
+                    genericException
+                )
+            )
 
-        // When
-        val result = repository.getAccount(accountId)
+            // When
+            val result = repository.getAccount(accountId)
 
-        // Then
-        assertTrue(result.isFailure)
-        assertEquals(genericException, result.exceptionOrNull())
-    }
+            // Then
+            assertTrue(result.isFailure)
+            assertEquals(genericException, result.exceptionOrNull())
+        }
 
     @Test
     fun `getAccount failure - dataSource returns Throwable - wraps in UnknownError`() = runTest {
@@ -100,7 +123,10 @@ class DetailRepositoryImplTest {
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
         assertTrue(exception is DetailException.UnknownError)
-        assertEquals("Error al procesar los datos de la cuenta.", (exception as DetailException.UnknownError).detailedMessage)
+        assertEquals(
+            "Error al procesar los datos de la cuenta.",
+            (exception as DetailException.AccountDataError).message
+        )
         assertEquals(causeThrowable, exception.cause)
     }
 
@@ -116,9 +142,14 @@ class DetailRepositoryImplTest {
             status = "Booked", transactionReference = "Ref1", transactionInformation = "Info1"
         )
         val transactionDto2 = TransactionDto( // Test with invalid amount string
-            transactionId = "tx2", accountId = accountId, amount = AmountDto("invalidAmount", "USD"),
-            bookingDateTime = "2023-01-02T11:00:00Z", creditDebitIndicator = "Debit",
-            status = "Pending", transactionReference = "Ref2", transactionInformation = "Info2"
+            transactionId = "tx2",
+            accountId = accountId,
+            amount = AmountDto("invalidAmount", "USD"),
+            bookingDateTime = "2023-01-02T11:00:00Z",
+            creditDebitIndicator = "Debit",
+            status = "Pending",
+            transactionReference = "Ref2",
+            transactionInformation = "Info2"
         )
         val dtoList = listOf(transactionDto1, transactionDto2)
         val expectedTransaction1 = Transaction(
@@ -155,35 +186,48 @@ class DetailRepositoryImplTest {
     }
 
     @Test
-    fun `getTransactions failure - dataSource returns Exception - propagates Exception`() = runTest {
-        // Given
-        val expectedException = DetailException.ServerError(500, "Server meltdown")
-        whenever(mockDataSource.getTransactions(accountId)).thenReturn(Result.failure(expectedException))
+    fun `getTransactions failure - dataSource returns Exception - propagates Exception`() =
+        runTest {
+            // Given
+            val expectedException = DetailException.ServerError(500, "Server meltdown")
+            whenever(mockDataSource.getTransactions(accountId)).thenReturn(
+                Result.failure(
+                    expectedException
+                )
+            )
 
-        // When
-        val result = repository.getTransactions(accountId)
+            // When
+            val result = repository.getTransactions(accountId)
 
-        // Then
-        assertTrue(result.isFailure)
-        assertEquals(expectedException, result.exceptionOrNull())
-    }
+            // Then
+            assertTrue(result.isFailure)
+            assertEquals(expectedException, result.exceptionOrNull())
+        }
 
     @Test
-    fun `getTransactions failure - dataSource returns Throwable - wraps in UnknownError`() = runTest {
-        // Given
-        val causeThrowable = object : Throwable("Another low level issue") {}
-        whenever(mockDataSource.getTransactions(accountId)).thenReturn(Result.failure(causeThrowable))
+    fun `getTransactions failure - dataSource returns Throwable - wraps in UnknownError`() =
+        runTest {
+            // Given
+            val causeThrowable = object : Throwable("Another low level issue") {}
+            whenever(mockDataSource.getTransactions(accountId)).thenReturn(
+                Result.failure(
+                    causeThrowable
+                )
+            )
 
-        // When
-        val result = repository.getTransactions(accountId)
+            // When
+            val result = repository.getTransactions(accountId)
 
-        // Then
-        assertTrue(result.isFailure)
-        val exception = result.exceptionOrNull()
-        assertTrue(exception is DetailException.UnknownError)
-        assertEquals("Error al procesar la lista de transacciones.", (exception as DetailException.UnknownError).detailedMessage)
-        assertEquals(causeThrowable, exception.cause)
-    }
+            // Then
+            assertTrue(result.isFailure)
+            val exception = result.exceptionOrNull()
+            assertTrue(exception is DetailException.UnknownError)
+            assertEquals(
+                "Error al procesar la lista de transacciones.",
+                (exception as DetailException.TransactionsDataError).message
+            )
+            assertEquals(causeThrowable, exception.cause)
+        }
 
     // --- getBalances Tests ---
 
@@ -191,12 +235,18 @@ class DetailRepositoryImplTest {
     fun `getBalances success - maps DTO list to domain Balance list`() = runTest {
         // Given
         val balanceDto1 = BalanceDto(
-            accountId = accountId, amount = AmountDto("2000.75", "EUR"),
-            creditDebitIndicator = "Credit", type = "ClosingBooked", dateTime = "2023-01-01T10:00:00Z"
+            accountId = accountId,
+            amount = AmountDto("2000.75", "EUR"),
+            creditDebitIndicator = "Credit",
+            type = "ClosingBooked",
+            dateTime = "2023-01-01T10:00:00Z"
         )
         val balanceDto2 = BalanceDto( // Test with invalid amount string
-            accountId = accountId, amount = AmountDto("badAmount", "USD"),
-            creditDebitIndicator = "Debit", type = "InterimAvailable", dateTime = "2023-01-02T11:00:00Z"
+            accountId = accountId,
+            amount = AmountDto("badAmount", "USD"),
+            creditDebitIndicator = "Debit",
+            type = "InterimAvailable",
+            dateTime = "2023-01-02T11:00:00Z"
         )
         val dtoList = listOf(balanceDto1, balanceDto2)
         val expectedBalance1 = Balance(
@@ -244,7 +294,10 @@ class DetailRepositoryImplTest {
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
         assertTrue(exception is DetailException.UnknownError)
-        assertEquals("Error al procesar la lista de saldos.", (exception as DetailException.UnknownError).detailedMessage)
+        assertEquals(
+            "Error al procesar la lista de saldos.",
+            (exception as DetailException.BalancesDataError).message
+        )
         assertEquals(causeThrowable, exception.cause)
     }
 
@@ -292,8 +345,11 @@ class DetailRepositoryImplTest {
         // Then
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
-        assertTrue(exception is DetailException.ReadUserDataError)
-        assertEquals("Error al procesar los datos del titular.", (exception as DetailException.ReadUserDataError))
+        assertTrue(exception is DetailException.PartyDataError)
+        assertEquals(
+            "Error al procesar los datos del titular.",
+            (exception as DetailException.PartyDataError).message
+        )
         assertEquals(causeThrowable, exception.cause)
     }
 }

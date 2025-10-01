@@ -8,7 +8,7 @@ sealed class DetailException(message: String? = null, cause: Throwable? = null) 
     // Errores Específicos de Autenticación
     object InvalidCredentials : Exception("Las credenciales proporcionadas son incorrectas.")
     object UserNotFound : Exception("El usuario no existe.")
-    object AccountDataError : Exception("Error al procesar los datos del titular.")
+    object AccountDataError : Exception("Error al procesar los datos de cuenta.")
     object TransactionsDataError : Exception("Error al procesar la lista de transacciones.")
     object BalancesDataError : Exception("Error al procesar la lista de saldos.")
     object PartyDataError : Exception("Error al procesar los datos del titular.")
