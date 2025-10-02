@@ -77,7 +77,7 @@ fun AuthScreen(
             }
         }
     }
-
+Any()
     Scaffold(
         snackbarHost = { SnackbarHost(snackBarHostState) },
         containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
